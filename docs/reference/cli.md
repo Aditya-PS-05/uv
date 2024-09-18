@@ -52,13 +52,21 @@ Run a command or script.
 
 Ensures that the command runs in a Python environment.
 
-When used with a file ending in `.py`, the file will be treated as a script and run with a Python interpreter, i.e., `uv run file.py` is equivalent to `uv run python file.py`. If the script contains inline dependency metadata, it will be installed into an isolated, ephemeral environment. When used with `-`, the input will be read from stdin, and treated as a Python script.
+When used with a file ending in `.py`, the file will be treated as a script and run with a Python
+interpreter, i.e., `uv run file.py` is equivalent to `uv run python file.py`. If the script contains
+inline dependency metadata, it will be installed into an isolated, ephemeral environment. When used
+with `-`, the input will be read from stdin, and treated as a Python script.
 
-When used in a project, the project environment will be created and updated before invoking the command.
+When used in a project, the project environment will be created and updated before invoking the
+command.
 
-When used outside a project, if a virtual environment can be found in the current directory or a parent directory, the command will be run in that environment. Otherwise, the command will be run in the environment of the discovered interpreter.
+When used outside a project, if a virtual environment can be found in the current directory or a
+parent directory, the command will be run in that environment. Otherwise, the command will be run in
+the environment of the discovered interpreter.
 
-Arguments following the command (or script) are not interpreted as arguments to uv. All options to uv must be provided before the command, e.g., `uv run --verbose foo`. A `--` can be used to separate the command from uv options for clarity, e.g., `uv run --python 3.12 -- python`.
+Arguments following the command (or script) are not interpreted as arguments to uv. All options to
+uv must be provided before the command, e.g., `uv run --verbose foo`. A `--` can be used to separate
+the command from uv options for clarity, e.g., `uv run --python 3.12 -- python`.
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -360,7 +368,6 @@ uv run [OPTIONS] <COMMAND>
 <p>This installs all specified dependencies.</p>
 </dd>
 
-
 </dd><dt><code>--with-editable</code> <i>with-editable</i></dt><dd><p>Run with the given packages installed as editables</p>
 
 <p>When used in a project, these dependencies will be layered on top of the project environment in a separate, ephemeral environment. These dependencies are allowed to conflict with those specified by the project.</p>
@@ -381,9 +388,11 @@ Follows the `pyproject.toml` specification.
 
 If a `pyproject.toml` already exists at the target, uv will exit with an error.
 
-If a `pyproject.toml` is found in any of the parent directories of the target path, the project will be added as a workspace member of the parent.
+If a `pyproject.toml` is found in any of the parent directories of the target path, the project will
+be added as a workspace member of the parent.
 
-Some project state is not created until needed, e.g., the project virtual environment (`.venv`) and lockfile (`uv.lock`) are lazily created during the first sync.
+Some project state is not created until needed, e.g., the project virtual environment (`.venv`) and
+lockfile (`uv.lock`) are lazily created during the first sync.
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -529,15 +538,23 @@ Add dependencies to the project.
 
 Dependencies are added to the project's `pyproject.toml` file.
 
-If a given dependency exists already, it will be updated to the new version specifier unless it includes markers that differ from the existing specifier in which case another entry for the dependency will be added.
+If a given dependency exists already, it will be updated to the new version specifier unless it
+includes markers that differ from the existing specifier in which case another entry for the
+dependency will be added.
 
-If no constraint or URL is provided for a dependency, a lower bound is added equal to the latest compatible version of the package, e.g., `>=1.2.3`, unless `--frozen` is provided, in which case no resolution is performed.
+If no constraint or URL is provided for a dependency, a lower bound is added equal to the latest
+compatible version of the package, e.g., `>=1.2.3`, unless `--frozen` is provided, in which case no
+resolution is performed.
 
-The lockfile and project environment will be updated to reflect the added dependencies. To skip updating the lockfile, use `--frozen`. To skip updating the environment, use `--no-sync`.
+The lockfile and project environment will be updated to reflect the added dependencies. To skip
+updating the lockfile, use `--frozen`. To skip updating the environment, use `--no-sync`.
 
-If any of the requested dependencies cannot be found, uv will exit with an error, unless the `--frozen` flag is provided, in which case uv will add the dependencies verbatim without checking that they exist or are compatible with the project.
+If any of the requested dependencies cannot be found, uv will exit with an error, unless the
+`--frozen` flag is provided, in which case uv will add the dependencies verbatim without checking
+that they exist or are compatible with the project.
 
-uv will search for a project in the current directory or any parent directory. If a project cannot be found, uv will exit with an error.
+uv will search for a project in the current directory or any parent directory. If a project cannot
+be found, uv will exit with an error.
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -839,15 +856,19 @@ Remove dependencies from the project.
 
 Dependencies are removed from the project's `pyproject.toml` file.
 
-If multiple entries exist for a given dependency, i.e., each with different markers, all of the entries will be removed.
+If multiple entries exist for a given dependency, i.e., each with different markers, all of the
+entries will be removed.
 
-The lockfile and project environment will be updated to reflect the removed dependencies. To skip updating the lockfile, use `--frozen`. To skip updating the environment, use `--no-sync`.
+The lockfile and project environment will be updated to reflect the removed dependencies. To skip
+updating the lockfile, use `--frozen`. To skip updating the environment, use `--no-sync`.
 
 If any of the requested dependencies are not present in the project, uv will exit with an error.
 
-If a package has been manually installed in the environment, i.e., with `uv pip install`, it will not be removed by `uv remove`.
+If a package has been manually installed in the environment, i.e., with `uv pip install`, it will
+not be removed by `uv remove`.
 
-uv will search for a project in the current directory or any parent directory. If a project cannot be found, uv will exit with an error.
+uv will search for a project in the current directory or any parent directory. If a project cannot
+be found, uv will exit with an error.
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -1125,15 +1146,21 @@ Update the project's environment.
 
 Syncing ensures that all project dependencies are installed and up-to-date with the lockfile.
 
-By default, an exact sync is performed: uv removes packages that are not declared as dependencies of the project. Use the `--inexact` flag to keep extraneous packages. Note that if an extraneous package conflicts with a project dependency, it will still be removed. Additionally, if `--no-build-isolation` is used, uv will not remove extraneous packages to avoid removing possible build dependencies.
+By default, an exact sync is performed: uv removes packages that are not declared as dependencies of
+the project. Use the `--inexact` flag to keep extraneous packages. Note that if an extraneous
+package conflicts with a project dependency, it will still be removed. Additionally, if
+`--no-build-isolation` is used, uv will not remove extraneous packages to avoid removing possible
+build dependencies.
 
 If the project virtual environment (`.venv`) does not exist, it will be created.
 
 The project is re-locked before syncing unless the `--locked` or `--frozen` flag is provided.
 
-uv will search for a project in the current directory or any parent directory. If a project cannot be found, uv will exit with an error.
+uv will search for a project in the current directory or any parent directory. If a project cannot
+be found, uv will exit with an error.
 
-Note that, when installing from a lockfile, uv will not provide warnings for yanked package versions.
+Note that, when installing from a lockfile, uv will not provide warnings for yanked package
+versions.
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -1429,9 +1456,11 @@ uv sync [OPTIONS]
 
 Update the project's lockfile.
 
-If the project lockfile (`uv.lock`) does not exist, it will be created. If a lockfile is present, its contents will be used as preferences for the resolution.
+If the project lockfile (`uv.lock`) does not exist, it will be created. If a lockfile is present,
+its contents will be used as preferences for the resolution.
 
-If there are no changes to the project's dependencies, locking will have no effect unless the `--upgrade` flag is provided.
+If there are no changes to the project's dependencies, locking will have no effect unless the
+`--upgrade` flag is provided.
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -1686,9 +1715,11 @@ At present, only `requirements-txt` is supported.
 
 The project is re-locked before exporting unless the `--locked` or `--frozen` flag is provided.
 
-uv will search for a project in the current directory or any parent directory. If a project cannot be found, uv will exit with an error.
+uv will search for a project in the current directory or any parent directory. If a project cannot
+be found, uv will exit with an error.
 
-If operating in a workspace, the root will be exported by default; however, a specific member can be selected using the `--package` option.
+If operating in a workspace, the root will be exported by default; however, a specific member can be
+selected using the `--package` option.
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -2320,9 +2351,12 @@ Run a command provided by a Python package.
 
 By default, the package to install is assumed to match the command name.
 
-The name of the command can include an exact version in the format `<package>@<version>`, e.g., `uv tool run ruff@0.3.0`. If more complex version specification is desired or if the command is provided by a different package, use `--from`.
+The name of the command can include an exact version in the format `<package>@<version>`, e.g.,
+`uv tool run ruff@0.3.0`. If more complex version specification is desired or if the command is
+provided by a different package, use `--from`.
 
-If the tool was previously installed, i.e., via `uv tool install`, the installed version will be used unless a version is requested or the `--isolated` flag is used.
+If the tool was previously installed, i.e., via `uv tool install`, the installed version will be
+used unless a version is requested or the `--isolated` flag is used.
 
 `uvx` is provided as a convenient alias for `uv tool run`, their behavior is identical.
 
@@ -2588,7 +2622,9 @@ uv tool run [OPTIONS] [COMMAND]
 
 Install commands provided by a Python package.
 
-Packages are installed into an isolated virtual environment in the uv tools directory. The executables are linked the tool executable directory, which is determined according to the XDG standard and can be retrieved with `uv tool dir --bin`.
+Packages are installed into an isolated virtual environment in the uv tools directory. The
+executables are linked the tool executable directory, which is determined according to the XDG
+standard and can be retrieved with `uv tool dir --bin`.
 
 If the tool was previously installed, the existing tool will generally be replaced.
 
@@ -2854,9 +2890,12 @@ uv tool install [OPTIONS] <PACKAGE>
 
 Upgrade installed tools.
 
-If a tool was installed with version constraints, they will be respected on upgrade — to upgrade a tool beyond the originally provided constraints, use `uv tool install` again.
+If a tool was installed with version constraints, they will be respected on upgrade — to upgrade a
+tool beyond the originally provided constraints, use `uv tool install` again.
 
-If a tool was installed with specific settings, they will be respected on upgraded. For example, if `--prereleases allow` was provided during installation, it will continue to be respected in upgrades.
+If a tool was installed with specific settings, they will be respected on upgraded. For example, if
+`--prereleases allow` was provided during installation, it will continue to be respected in
+upgrades.
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -3273,11 +3312,14 @@ uv tool uninstall [OPTIONS] <NAME>...
 
 Ensure that the tool executable directory is on the `PATH`.
 
-If the tool executable directory is not present on the `PATH`, uv will attempt to add it to the relevant shell configuration files.
+If the tool executable directory is not present on the `PATH`, uv will attempt to add it to the
+relevant shell configuration files.
 
-If the shell configuration files already include a blurb to add the executable directory to the path, but the directory is not present on the `PATH`, uv will exit with an error.
+If the shell configuration files already include a blurb to add the executable directory to the
+path, but the directory is not present on the `PATH`, uv will exit with an error.
 
-The tool executable directory is determined according to the XDG standard and can be retrieved with `uv tool dir --bin`.
+The tool executable directory is determined according to the XDG standard and can be retrieved with
+`uv tool dir --bin`.
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -3368,7 +3410,8 @@ Show the path to the uv tools directory.
 
 The tools directory is used to store environments and metadata for installed tools.
 
-By default, tools are stored in the uv data directory at `$XDG_DATA_HOME/uv/tools` or `$HOME/.local/share/uv/tools` on Unix and `%APPDATA%\uv\data\tools` on Windows.
+By default, tools are stored in the uv data directory at `$XDG_DATA_HOME/uv/tools` or
+`$HOME/.local/share/uv/tools` on Unix and `%APPDATA%\uv\data\tools` on Windows.
 
 The tool installation directory may be overridden with `$UV_TOOL_DIR`.
 
@@ -3477,16 +3520,15 @@ uv tool dir [OPTIONS]
 
 Manage Python versions and installations
 
-Generally, uv first searches for Python in a virtual environment, either active or in a
-`.venv` directory  in the current working directory or any parent directory. If a virtual
-environment is not required, uv will then search for a Python interpreter. Python
-interpreters are found by searching for Python executables in the `PATH` environment
-variable.
+Generally, uv first searches for Python in a virtual environment, either active or in a `.venv`
+directory in the current working directory or any parent directory. If a virtual environment is not
+required, uv will then search for a Python interpreter. Python interpreters are found by searching
+for Python executables in the `PATH` environment variable.
 
 On Windows, the `py` launcher is also invoked to find Python executables.
 
-By default, uv will download Python if a version cannot be found. This behavior can be
-disabled with the `--no-python-downloads` flag or the `python-downloads` setting.
+By default, uv will download Python if a version cannot be found. This behavior can be disabled with
+the `--no-python-downloads` flag or the `python-downloads` setting.
 
 The `--python` option allows requesting a different interpreter.
 
@@ -3506,14 +3548,14 @@ Additionally, a specific system Python interpreter can often be requested with:
 - `<executable-name>` e.g. `mypython3`
 - `<install-dir>` e.g. `/some/environment/`
 
-When the `--python` option is used, normal discovery rules apply but discovered interpreters
-are checked for compatibility with the request, e.g., if `pypy` is requested, uv will first
-check if the virtual environment contains a PyPy interpreter then check if each executable
-in the path is a PyPy interpreter.
+When the `--python` option is used, normal discovery rules apply but discovered interpreters are
+checked for compatibility with the request, e.g., if `pypy` is requested, uv will first check if the
+virtual environment contains a PyPy interpreter then check if each executable in the path is a PyPy
+interpreter.
 
-uv supports discovering CPython, PyPy, and GraalPy interpreters. Unsupported interpreters
-will be skipped during discovery. If an unsupported interpreter implementation is requested,
-uv will exit with an error.
+uv supports discovering CPython, PyPy, and GraalPy interpreters. Unsupported interpreters will be
+skipped during discovery. If an unsupported interpreter implementation is requested, uv will exit
+with an error.
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -3541,9 +3583,11 @@ uv python [OPTIONS] <COMMAND>
 
 List the available Python installations.
 
-By default, installed Python versions and the downloads for latest available patch version of each supported Python major version are shown.
+By default, installed Python versions and the downloads for latest available patch version of each
+supported Python major version are shown.
 
-The displayed versions are filtered by the `--python-preference` option, i.e., if using `only-system`, no managed Python versions will be shown.
+The displayed versions are filtered by the `--python-preference` option, i.e., if using
+`only-system`, no managed Python versions will be shown.
 
 Use `--all-versions` to view all available patch versions.
 
@@ -3654,7 +3698,9 @@ Supports CPython and PyPy.
 
 CPython distributions are downloaded from the `python-build-standalone` project.
 
-Python versions are installed into the uv Python directory, which can be retrieved with `uv python dir`. A `python` executable is not made globally available, managed Python versions are only used in uv commands or in active virtual environments.
+Python versions are installed into the uv Python directory, which can be retrieved with
+`uv python dir`. A `python` executable is not made globally available, managed Python versions are
+only used in uv commands or in active virtual environments.
 
 See `uv help python` to view supported request formats.
 
@@ -3869,7 +3915,8 @@ uv python find [OPTIONS] [REQUEST]
 
 Pin to a specific Python version.
 
-Writes the pinned version to a `.python-version` file, which is then read by other uv commands when determining the required Python version.
+Writes the pinned version to a `.python-version` file, which is then read by other uv commands when
+determining the required Python version.
 
 See `uv help python` to view supported request formats.
 
@@ -3980,7 +4027,8 @@ uv python pin [OPTIONS] [REQUEST]
 
 Show the uv Python installation directory.
 
-By default, Python installations are stored in the uv data directory at `$XDG_DATA_HOME/uv/python` or `$HOME/.local/share/uv/python` on Unix and `%APPDATA%\uv\data\python` on Windows.
+By default, Python installations are stored in the uv data directory at `$XDG_DATA_HOME/uv/python`
+or `$HOME/.local/share/uv/python` on Unix and `%APPDATA%\uv\data\python` on Windows.
 
 The Python installation directory may be overridden with `$UV_PYTHON_INSTALL_DIR`.
 
@@ -5989,13 +6037,17 @@ uv pip check [OPTIONS]
 
 Create a virtual environment.
 
-By default, creates a virtual environment named `.venv` in the working directory. An alternative path may be provided positionally.
+By default, creates a virtual environment named `.venv` in the working directory. An alternative
+path may be provided positionally.
 
-If in a project, the default environment name can be changed with the `UV_PROJECT_ENVIRONMENT` environment variable; this only applies when run from the project root directory.
+If in a project, the default environment name can be changed with the `UV_PROJECT_ENVIRONMENT`
+environment variable; this only applies when run from the project root directory.
 
-If a virtual environment exists at the target path, it will be removed and a new, empty virtual environment will be created.
+If a virtual environment exists at the target path, it will be removed and a new, empty virtual
+environment will be created.
 
-When using uv, the virtual environment does not need to be activated. uv will find a virtual environment (named `.venv`) in the working directory or any parent directories.
+When using uv, the virtual environment does not need to be activated. uv will find a virtual
+environment (named `.venv`) in the working directory or any parent directories.
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -6215,13 +6267,17 @@ uv venv [OPTIONS] [PATH]
 
 Build Python packages into source distributions and wheels.
 
-`uv build` accepts a path to a directory or source distribution, which defaults to the current working directory.
+`uv build` accepts a path to a directory or source distribution, which defaults to the current
+working directory.
 
-By default, if passed a directory, `uv build` will build a source distribution ("sdist") from the source directory, and a binary distribution ("wheel") from  the source distribution.
+By default, if passed a directory, `uv build` will build a source distribution ("sdist") from the
+source directory, and a binary distribution ("wheel") from the source distribution.
 
-`uv build --sdist` can be used to build only the source distribution, `uv build --wheel` can be used to build only the binary distribution, and `uv build --sdist --wheel` can be used to build both distributions from source.
+`uv build --sdist` can be used to build only the source distribution, `uv build --wheel` can be used
+to build only the binary distribution, and `uv build --sdist --wheel` can be used to build both
+distributions from source.
 
-If passed a source distribution, `uv build --wheel` will build a wheel from  the source distribution.
+If passed a source distribution, `uv build --wheel` will build a wheel from the source distribution.
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -6713,13 +6769,17 @@ uv cache prune [OPTIONS]
 
 Show the cache directory.
 
-By default, the cache is stored in  `$XDG_CACHE_HOME/uv` or `$HOME/.cache/uv` on Unix and `%LOCALAPPDATA%\uv\cache` on Windows.
+By default, the cache is stored in `$XDG_CACHE_HOME/uv` or `$HOME/.cache/uv` on Unix and
+`%LOCALAPPDATA%\uv\cache` on Windows.
 
-When `--no-cache` is used, the cache is stored in a temporary directory and discarded when the process exits.
+When `--no-cache` is used, the cache is stored in a temporary directory and discarded when the
+process exits.
 
-An alternative cache directory may be specified via the `cache-dir` setting, the `--cache-dir` option, or the `$UV_CACHE_DIR` environment variable.
+An alternative cache directory may be specified via the `cache-dir` setting, the `--cache-dir`
+option, or the `$UV_CACHE_DIR` environment variable.
 
-Note that it is important for performance for the cache directory to be located on the same file system as the Python environment uv is operating on.
+Note that it is important for performance for the cache directory to be located on the same file
+system as the Python environment uv is operating on.
 
 <h3 class="cli-reference">Usage</h3>
 
@@ -6907,8 +6967,6 @@ uv generate-shell-completion <SHELL>
 
 </dd></dl>
 
-
-
 ## uv help
 
 Display documentation for a command
@@ -7001,4 +7059,3 @@ uv help [OPTIONS] [COMMAND]...
 </dd><dt><code>--version</code>, <code>-V</code></dt><dd><p>Display the uv version</p>
 
 </dd></dl>
-

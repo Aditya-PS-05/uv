@@ -1,19 +1,18 @@
 ## Project metadata
+
 ### [`constraint-dependencies`](#constraint-dependencies) {: #constraint-dependencies }
 
 Constraints to apply when resolving the project's dependencies.
 
-Constraints are used to restrict the versions of dependencies that are selected during
-resolution.
+Constraints are used to restrict the versions of dependencies that are selected during resolution.
 
-Including a package as a constraint will _not_ trigger installation of the package on its
-own; instead, the package must be requested elsewhere in the project's first-party or
-transitive dependencies.
+Including a package as a constraint will _not_ trigger installation of the package on its own;
+instead, the package must be requested elsewhere in the project's first-party or transitive
+dependencies.
 
-!!! note
-    In `uv lock`, `uv sync`, and `uv run`, uv will only read `constraint-dependencies` from
-    the `pyproject.toml` at the workspace root, and will ignore any declarations in other
-    workspace members or `uv.toml` files.
+!!! note In `uv lock`, `uv sync`, and `uv run`, uv will only read `constraint-dependencies` from the
+`pyproject.toml` at the workspace root, and will ignore any declarations in other workspace members
+or `uv.toml` files.
 
 **Default value**: `[]`
 
@@ -32,8 +31,8 @@ constraint-dependencies = ["grpcio<1.65"]
 
 ### [`dev-dependencies`](#dev-dependencies) {: #dev-dependencies }
 
-The project's development dependencies. Development dependencies will be installed by
-default in `uv run` and `uv sync`, but will not appear in the project's published metadata.
+The project's development dependencies. Development dependencies will be installed by default in
+`uv run` and `uv sync`, but will not appear in the project's published metadata.
 
 **Default value**: `[]`
 
@@ -52,12 +51,11 @@ dev-dependencies = ["ruff==0.5.0"]
 
 A list of supported environments against which to resolve dependencies.
 
-By default, uv will resolve for all possible environments during a `uv lock` operation.
-However, you can restrict the set of supported environments to improve performance and avoid
-unsatisfiable branches in the solution space.
+By default, uv will resolve for all possible environments during a `uv lock` operation. However, you
+can restrict the set of supported environments to improve performance and avoid unsatisfiable
+branches in the solution space.
 
-These environments will also respected when `uv pip compile` is invoked with the
-`--universal` flag.
+These environments will also respected when `uv pip compile` is invoked with the `--universal` flag.
 
 **Default value**: `[]`
 
@@ -75,8 +73,8 @@ environments = ["sys_platform == 'darwin'"]
 
 ### [`managed`](#managed) {: #managed }
 
-Whether the project is managed by uv. If `false`, uv will ignore the project when
-`uv run` is invoked.
+Whether the project is managed by uv. If `false`, uv will ignore the project when `uv run` is
+invoked.
 
 **Default value**: `true`
 
@@ -95,18 +93,17 @@ managed = false
 
 Overrides to apply when resolving the project's dependencies.
 
-Overrides are used to force selection of a specific version of a package, regardless of the
-version requested by any other package, and regardless of whether choosing that version
-would typically constitute an invalid resolution.
+Overrides are used to force selection of a specific version of a package, regardless of the version
+requested by any other package, and regardless of whether choosing that version would typically
+constitute an invalid resolution.
 
-While constraints are _additive_, in that they're combined with the requirements of the
-constituent packages, overrides are _absolute_, in that they completely replace the
-requirements of any constituent packages.
+While constraints are _additive_, in that they're combined with the requirements of the constituent
+packages, overrides are _absolute_, in that they completely replace the requirements of any
+constituent packages.
 
-!!! note
-    In `uv lock`, `uv sync`, and `uv run`, uv will only read `override-dependencies` from
-    the `pyproject.toml` at the workspace root, and will ignore any declarations in other
-    workspace members or `uv.toml` files.
+!!! note In `uv lock`, `uv sync`, and `uv run`, uv will only read `override-dependencies` from the
+`pyproject.toml` at the workspace root, and will ignore any declarations in other workspace members
+or `uv.toml` files.
 
 **Default value**: `[]`
 
@@ -125,16 +122,15 @@ override-dependencies = ["werkzeug==2.3.0"]
 
 ### [`package`](#package) {: #package }
 
-Whether the project should be considered a Python package, or a non-package ("virtual")
-project.
+Whether the project should be considered a Python package, or a non-package ("virtual") project.
 
-Packages are built and installed into the virtual environment in editable mode and thus
-require a build backend, while virtual projects are _not_ built or installed; instead, only
-their dependencies are included in the virtual environment.
+Packages are built and installed into the virtual environment in editable mode and thus require a
+build backend, while virtual projects are _not_ built or installed; instead, only their dependencies
+are included in the virtual environment.
 
-Creating a package requires that a `build-system` is present in the `pyproject.toml`, and
-that the project adheres to a structure that adheres to the build backend's expectations
-(e.g., a `src` layout).
+Creating a package requires that a `build-system` is present in the `pyproject.toml`, and that the
+project adheres to a structure that adheres to the build backend's expectations (e.g., a `src`
+layout).
 
 **Default value**: `true`
 
@@ -152,14 +148,16 @@ package = false
 ### `workspace`
 
 #### [`exclude`](#workspace_exclude) {: #workspace_exclude }
+
 <span id="exclude"></span>
 
-Packages to exclude as workspace members. If a package matches both `members` and
-`exclude`, it will be excluded.
+Packages to exclude as workspace members. If a package matches both `members` and `exclude`, it will
+be excluded.
 
 Supports both globs and explicit paths.
 
-For more information on the glob syntax, refer to the [`glob` documentation](https://docs.rs/glob/latest/glob/struct.Pattern.html).
+For more information on the glob syntax, refer to the
+[`glob` documentation](https://docs.rs/glob/latest/glob/struct.Pattern.html).
 
 **Default value**: `[]`
 
@@ -175,13 +173,15 @@ exclude = ["member1", "path/to/member2", "libs/*"]
 ---
 
 #### [`members`](#workspace_members) {: #workspace_members }
+
 <span id="members"></span>
 
 Packages to include as workspace members.
 
 Supports both globs and explicit paths.
 
-For more information on the glob syntax, refer to the [`glob` documentation](https://docs.rs/glob/latest/glob/struct.Pattern.html).
+For more information on the glob syntax, refer to the
+[`glob` documentation](https://docs.rs/glob/latest/glob/struct.Pattern.html).
 
 **Default value**: `[]`
 
@@ -197,16 +197,17 @@ members = ["member1", "path/to/member2", "libs/*"]
 ---
 
 ## Configuration
+
 ### [`allow-insecure-host`](#allow-insecure-host) {: #allow-insecure-host }
 
 Allow insecure connections to host.
 
-Expects to receive either a hostname (e.g., `localhost`), a host-port pair (e.g.,
-`localhost:8080`), or a URL (e.g., `https://localhost`).
+Expects to receive either a hostname (e.g., `localhost`), a host-port pair (e.g., `localhost:8080`),
+or a URL (e.g., `https://localhost`).
 
-WARNING: Hosts included in this list will not be verified against the system's certificate
-store. Only use `--allow-insecure-host` in a secure network with verified sources, as it
-bypasses SSL verification and could expose you to MITM attacks.
+WARNING: Hosts included in this list will not be verified against the system's certificate store.
+Only use `--allow-insecure-host` in a secure network with verified sources, as it bypasses SSL
+verification and could expose you to MITM attacks.
 
 **Default value**: `[]`
 
@@ -220,10 +221,11 @@ bypasses SSL verification and could expose you to MITM attacks.
     [tool.uv]
     allow-insecure-host = ["localhost:8080"]
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     allow-insecure-host = ["localhost:8080"]
     ```
 
@@ -233,8 +235,8 @@ bypasses SSL verification and could expose you to MITM attacks.
 
 Path to the cache directory.
 
-Defaults to `$HOME/Library/Caches/uv` on macOS, `$XDG_CACHE_HOME/uv` or `$HOME/.cache/uv` on
-Linux, and `%LOCALAPPDATA%\uv\cache` on Windows.
+Defaults to `$HOME/Library/Caches/uv` on macOS, `$XDG_CACHE_HOME/uv` or `$HOME/.cache/uv` on Linux,
+and `%LOCALAPPDATA%\uv\cache` on Windows.
 
 **Default value**: `None`
 
@@ -248,10 +250,11 @@ Linux, and `%LOCALAPPDATA%\uv\cache` on Windows.
     [tool.uv]
     cache-dir = "./.uv_cache"
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     cache-dir = "./.uv_cache"
     ```
 
@@ -262,32 +265,32 @@ Linux, and `%LOCALAPPDATA%\uv\cache` on Windows.
 The keys to consider when caching builds for the project.
 
 Cache keys enable you to specify the files or directories that should trigger a rebuild when
-modified. By default, uv will rebuild a project whenever the `pyproject.toml`, `setup.py`,
-or `setup.cfg` files in the project directory are modified, i.e.:
+modified. By default, uv will rebuild a project whenever the `pyproject.toml`, `setup.py`, or
+`setup.cfg` files in the project directory are modified, i.e.:
 
 ```toml
 cache-keys = [{ file = "pyproject.toml" }, { file = "setup.py" }, { file = "setup.cfg" }]
 ```
 
-As an example: if a project uses dynamic metadata to read its dependencies from a
-`requirements.txt` file, you can specify `cache-keys = [{ file = "requirements.txt" }, { file = "pyproject.toml" }]`
-to ensure that the project is rebuilt whenever the `requirements.txt` file is modified (in
-addition to watching the `pyproject.toml`).
+As an example: if a project uses dynamic metadata to read its dependencies from a `requirements.txt`
+file, you can specify `cache-keys = [{ file = "requirements.txt" }, { file = "pyproject.toml" }]` to
+ensure that the project is rebuilt whenever the `requirements.txt` file is modified (in addition to
+watching the `pyproject.toml`).
 
-Globs are supported, following the syntax of the [`glob`](https://docs.rs/glob/0.3.1/glob/struct.Pattern.html)
-crate. For example, to invalidate the cache whenever a `.toml` file in the project directory
-or any of its subdirectories is modified, you can specify `cache-keys = [{ file = "**/*.toml" }]`.
-Note that the use of globs can be expensive, as uv may need to walk the filesystem to
-determine whether any files have changed.
+Globs are supported, following the syntax of the
+[`glob`](https://docs.rs/glob/0.3.1/glob/struct.Pattern.html) crate. For example, to invalidate the
+cache whenever a `.toml` file in the project directory or any of its subdirectories is modified, you
+can specify `cache-keys = [{ file = "**/*.toml" }]`. Note that the use of globs can be expensive, as
+uv may need to walk the filesystem to determine whether any files have changed.
 
 Cache keys can also include version control information. For example, if a project uses
-`setuptools_scm` to read its version from a Git tag, you can specify `cache-keys = [{ git = true }, { file = "pyproject.toml" }]`
-to include the current Git commit hash in the cache key (in addition to the
-`pyproject.toml`).
+`setuptools_scm` to read its version from a Git tag, you can specify
+`cache-keys = [{ git = true }, { file = "pyproject.toml" }]` to include the current Git commit hash
+in the cache key (in addition to the `pyproject.toml`).
 
-Cache keys only affect the project defined by the `pyproject.toml` in which they're
-specified (as opposed to, e.g., affecting all members in a workspace), and all paths and
-globs are interpreted as relative to the project directory.
+Cache keys only affect the project defined by the `pyproject.toml` in which they're specified (as
+opposed to, e.g., affecting all members in a workspace), and all paths and globs are interpreted as
+relative to the project directory.
 
 **Default value**: `[{ file = "pyproject.toml" }, { file = "setup.py" }, { file = "setup.cfg" }]`
 
@@ -301,10 +304,11 @@ globs are interpreted as relative to the project directory.
     [tool.uv]
     cache-keys = [{ file = "pyproject.toml" }, { file = "requirements.txt" }, { git = true }]
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     cache-keys = [{ file = "pyproject.toml" }, { file = "requirements.txt" }, { git = true }]
     ```
 
@@ -314,14 +318,13 @@ globs are interpreted as relative to the project directory.
 
 Compile Python files to bytecode after installation.
 
-By default, uv does not compile Python (`.py`) files to bytecode (`__pycache__/*.pyc`);
-instead, compilation is performed lazily the first time a module is imported. For use-cases
-in which start time is critical, such as CLI applications and Docker containers, this option
-can be enabled to trade longer installation times for faster start times.
+By default, uv does not compile Python (`.py`) files to bytecode (`__pycache__/*.pyc`); instead,
+compilation is performed lazily the first time a module is imported. For use-cases in which start
+time is critical, such as CLI applications and Docker containers, this option can be enabled to
+trade longer installation times for faster start times.
 
-When enabled, uv will process the entire site-packages directory (including packages that
-are not being modified by the current operation) for consistency. Like pip, it will also
-ignore errors.
+When enabled, uv will process the entire site-packages directory (including packages that are not
+being modified by the current operation) for consistency. Like pip, it will also ignore errors.
 
 **Default value**: `false`
 
@@ -335,10 +338,11 @@ ignore errors.
     [tool.uv]
     compile-bytecode = true
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     compile-bytecode = true
     ```
 
@@ -346,8 +350,7 @@ ignore errors.
 
 ### [`concurrent-builds`](#concurrent-builds) {: #concurrent-builds }
 
-The maximum number of source distributions that uv will build concurrently at any given
-time.
+The maximum number of source distributions that uv will build concurrently at any given time.
 
 Defaults to the number of available CPU cores.
 
@@ -363,10 +366,11 @@ Defaults to the number of available CPU cores.
     [tool.uv]
     concurrent-builds = 4
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     concurrent-builds = 4
     ```
 
@@ -374,8 +378,7 @@ Defaults to the number of available CPU cores.
 
 ### [`concurrent-downloads`](#concurrent-downloads) {: #concurrent-downloads }
 
-The maximum number of in-flight concurrent downloads that uv will perform at any given
-time.
+The maximum number of in-flight concurrent downloads that uv will perform at any given time.
 
 **Default value**: `50`
 
@@ -389,10 +392,11 @@ time.
     [tool.uv]
     concurrent-downloads = 4
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     concurrent-downloads = 4
     ```
 
@@ -416,10 +420,11 @@ Defaults to the number of available CPU cores.
     [tool.uv]
     concurrent-installs = 4
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     concurrent-installs = 4
     ```
 
@@ -427,8 +432,8 @@ Defaults to the number of available CPU cores.
 
 ### [`config-settings`](#config-settings) {: #config-settings }
 
-Settings to pass to the [PEP 517](https://peps.python.org/pep-0517/) build backend,
-specified as `KEY=VALUE` pairs.
+Settings to pass to the [PEP 517](https://peps.python.org/pep-0517/) build backend, specified as
+`KEY=VALUE` pairs.
 
 **Default value**: `{}`
 
@@ -442,10 +447,11 @@ specified as `KEY=VALUE` pairs.
     [tool.uv]
     config-settings = { editable_mode = "compat" }
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     config-settings = { editable_mode = "compat" }
     ```
 
@@ -456,8 +462,8 @@ specified as `KEY=VALUE` pairs.
 Limit candidate packages to those that were uploaded prior to the given date.
 
 Accepts both [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) timestamps (e.g.,
-`2006-12-02T02:07:43Z`) and local dates in the same format (e.g., `2006-12-02`) in your
-system's configured time zone.
+`2006-12-02T02:07:43Z`) and local dates in the same format (e.g., `2006-12-02`) in your system's
+configured time zone.
 
 **Default value**: `None`
 
@@ -471,10 +477,11 @@ system's configured time zone.
     [tool.uv]
     exclude-newer = "2006-12-02"
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     exclude-newer = "2006-12-02"
     ```
 
@@ -484,8 +491,8 @@ system's configured time zone.
 
 Extra URLs of package indexes to use, in addition to `--index-url`.
 
-Accepts either a repository compliant with [PEP 503](https://peps.python.org/pep-0503/)
-(the simple repository API), or a local directory laid out in the same format.
+Accepts either a repository compliant with [PEP 503](https://peps.python.org/pep-0503/) (the simple
+repository API), or a local directory laid out in the same format.
 
 All indexes provided via this flag take priority over the index specified by
 [`index_url`](#index-url). When multiple indexes are provided, earlier values take priority.
@@ -505,10 +512,11 @@ To control uv's resolution strategy when multiple indexes are present, see
     [tool.uv]
     extra-index-url = ["https://download.pytorch.org/whl/cpu"]
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     extra-index-url = ["https://download.pytorch.org/whl/cpu"]
     ```
 
@@ -516,14 +524,13 @@ To control uv's resolution strategy when multiple indexes are present, see
 
 ### [`find-links`](#find-links) {: #find-links }
 
-Locations to search for candidate distributions, in addition to those found in the registry
-indexes.
+Locations to search for candidate distributions, in addition to those found in the registry indexes.
 
-If a path, the target must be a directory that contains packages as wheel files (`.whl`) or
-source distributions (e.g., `.tar.gz` or `.zip`) at the top level.
+If a path, the target must be a directory that contains packages as wheel files (`.whl`) or source
+distributions (e.g., `.tar.gz` or `.zip`) at the top level.
 
-If a URL, the page must contain a flat list of links to package files adhering to the
-formats described above.
+If a URL, the page must contain a flat list of links to package files adhering to the formats
+described above.
 
 **Default value**: `[]`
 
@@ -537,10 +544,11 @@ formats described above.
     [tool.uv]
     find-links = ["https://download.pytorch.org/whl/torch_stable.html"]
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     find-links = ["https://download.pytorch.org/whl/torch_stable.html"]
     ```
 
@@ -550,18 +558,22 @@ formats described above.
 
 The strategy to use when resolving against multiple index URLs.
 
-By default, uv will stop at the first index on which a given package is available, and
-limit resolutions to those present on that first index (`first-match`). This prevents
-"dependency confusion" attacks, whereby an attack can upload a malicious package under the
-same name to a secondary.
+By default, uv will stop at the first index on which a given package is available, and limit
+resolutions to those present on that first index (`first-match`). This prevents "dependency
+confusion" attacks, whereby an attack can upload a malicious package under the same name to a
+secondary.
 
 **Default value**: `"first-index"`
 
 **Possible values**:
 
-- `"first-index"`: Only use results from the first index that returns a match for a given package name
-- `"unsafe-first-match"`: Search for every package name across all indexes, exhausting the versions from the first index before moving on to the next
-- `"unsafe-best-match"`: Search for every package name across all indexes, preferring the "best" version found. If a package version is in multiple indexes, only look at the entry for the first index
+- `"first-index"`: Only use results from the first index that returns a match for a given package
+  name
+- `"unsafe-first-match"`: Search for every package name across all indexes, exhausting the versions
+  from the first index before moving on to the next
+- `"unsafe-best-match"`: Search for every package name across all indexes, preferring the "best"
+  version found. If a package version is in multiple indexes, only look at the entry for the first
+  index
 
 **Example usage**:
 
@@ -571,10 +583,11 @@ same name to a secondary.
     [tool.uv]
     index-strategy = "unsafe-best-match"
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     index-strategy = "unsafe-best-match"
     ```
 
@@ -584,8 +597,8 @@ same name to a secondary.
 
 The URL of the Python package index (by default: <https://pypi.org/simple>).
 
-Accepts either a repository compliant with [PEP 503](https://peps.python.org/pep-0503/)
-(the simple repository API), or a local directory laid out in the same format.
+Accepts either a repository compliant with [PEP 503](https://peps.python.org/pep-0503/) (the simple
+repository API), or a local directory laid out in the same format.
 
 The index provided by this setting is given lower priority than any indexes specified via
 [`extra_index_url`](#extra-index-url).
@@ -602,10 +615,11 @@ The index provided by this setting is given lower priority than any indexes spec
     [tool.uv]
     index-url = "https://test.pypi.org/simple"
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     index-url = "https://test.pypi.org/simple"
     ```
 
@@ -615,8 +629,8 @@ The index provided by this setting is given lower priority than any indexes spec
 
 Attempt to use `keyring` for authentication for index URLs.
 
-At present, only `--keyring-provider subprocess` is supported, which configures uv to
-use the `keyring` CLI to handle authentication.
+At present, only `--keyring-provider subprocess` is supported, which configures uv to use the
+`keyring` CLI to handle authentication.
 
 **Default value**: `"disabled"`
 
@@ -630,10 +644,11 @@ use the `keyring` CLI to handle authentication.
     [tool.uv]
     keyring-provider = "subprocess"
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     keyring-provider = "subprocess"
     ```
 
@@ -643,8 +658,7 @@ use the `keyring` CLI to handle authentication.
 
 The method to use when installing packages from the global cache.
 
-Defaults to `clone` (also known as Copy-on-Write) on macOS, and `hardlink` on Linux and
-Windows.
+Defaults to `clone` (also known as Copy-on-Write) on macOS, and `hardlink` on Linux and Windows.
 
 **Default value**: `"clone" (macOS) or "hardlink" (Linux, Windows)`
 
@@ -663,10 +677,11 @@ Windows.
     [tool.uv]
     link-mode = "copy"
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     link-mode = "copy"
     ```
 
@@ -676,13 +691,13 @@ Windows.
 
 Whether to load TLS certificates from the platform's native certificate store.
 
-By default, uv loads certificates from the bundled `webpki-roots` crate. The
-`webpki-roots` are a reliable set of trust roots from Mozilla, and including them in uv
-improves portability and performance (especially on macOS).
+By default, uv loads certificates from the bundled `webpki-roots` crate. The `webpki-roots` are a
+reliable set of trust roots from Mozilla, and including them in uv improves portability and
+performance (especially on macOS).
 
-However, in some cases, you may want to use the platform's native certificate store,
-especially if you're relying on a corporate trust root (e.g., for a mandatory proxy) that's
-included in your system's certificate store.
+However, in some cases, you may want to use the platform's native certificate store, especially if
+you're relying on a corporate trust root (e.g., for a mandatory proxy) that's included in your
+system's certificate store.
 
 **Default value**: `false`
 
@@ -696,10 +711,11 @@ included in your system's certificate store.
     [tool.uv]
     native-tls = true
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     native-tls = true
     ```
 
@@ -709,8 +725,8 @@ included in your system's certificate store.
 
 Don't install pre-built wheels.
 
-The given packages will be built and installed from source. The resolver will still use
-pre-built wheels to extract package metadata, if available.
+The given packages will be built and installed from source. The resolver will still use pre-built
+wheels to extract package metadata, if available.
 
 **Default value**: `false`
 
@@ -724,10 +740,11 @@ pre-built wheels to extract package metadata, if available.
     [tool.uv]
     no-binary = true
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     no-binary = true
     ```
 
@@ -749,10 +766,11 @@ Don't install pre-built wheels for a specific package.
     [tool.uv]
     no-binary-package = ["ruff"]
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     no-binary-package = ["ruff"]
     ```
 
@@ -762,9 +780,9 @@ Don't install pre-built wheels for a specific package.
 
 Don't build source distributions.
 
-When enabled, resolving will not run arbitrary Python code. The cached wheels of
-already-built source distributions will be reused, but operations that require building
-distributions will exit with an error.
+When enabled, resolving will not run arbitrary Python code. The cached wheels of already-built
+source distributions will be reused, but operations that require building distributions will exit
+with an error.
 
 **Default value**: `false`
 
@@ -778,10 +796,11 @@ distributions will exit with an error.
     [tool.uv]
     no-build = true
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     no-build = true
     ```
 
@@ -791,8 +810,8 @@ distributions will exit with an error.
 
 Disable isolation when building source distributions.
 
-Assumes that build dependencies specified by [PEP 518](https://peps.python.org/pep-0518/)
-are already installed.
+Assumes that build dependencies specified by [PEP 518](https://peps.python.org/pep-0518/) are
+already installed.
 
 **Default value**: `false`
 
@@ -806,10 +825,11 @@ are already installed.
     [tool.uv]
     no-build-isolation = true
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     no-build-isolation = true
     ```
 
@@ -819,8 +839,8 @@ are already installed.
 
 Disable isolation when building source distributions for a specific package.
 
-Assumes that the packages' build dependencies specified by [PEP 518](https://peps.python.org/pep-0518/)
-are already installed.
+Assumes that the packages' build dependencies specified by
+[PEP 518](https://peps.python.org/pep-0518/) are already installed.
 
 **Default value**: `[]`
 
@@ -834,10 +854,11 @@ are already installed.
     [tool.uv]
     no-build-isolation-package = ["package1", "package2"]
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     no-build-isolation-package = ["package1", "package2"]
     ```
 
@@ -859,10 +880,11 @@ Don't build source distributions for a specific package.
     [tool.uv]
     no-build-package = ["ruff"]
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     no-build-package = ["ruff"]
     ```
 
@@ -870,8 +892,8 @@ Don't build source distributions for a specific package.
 
 ### [`no-cache`](#no-cache) {: #no-cache }
 
-Avoid reading from or writing to the cache, instead using a temporary directory for the
-duration of the operation.
+Avoid reading from or writing to the cache, instead using a temporary directory for the duration of
+the operation.
 
 **Default value**: `false`
 
@@ -885,10 +907,11 @@ duration of the operation.
     [tool.uv]
     no-cache = true
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     no-cache = true
     ```
 
@@ -896,8 +919,8 @@ duration of the operation.
 
 ### [`no-index`](#no-index) {: #no-index }
 
-Ignore all registry indexes (e.g., PyPI), instead relying on direct URL dependencies and
-those provided via `--find-links`.
+Ignore all registry indexes (e.g., PyPI), instead relying on direct URL dependencies and those
+provided via `--find-links`.
 
 **Default value**: `false`
 
@@ -911,10 +934,11 @@ those provided via `--find-links`.
     [tool.uv]
     no-index = true
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     no-index = true
     ```
 
@@ -923,8 +947,7 @@ those provided via `--find-links`.
 ### [`no-sources`](#no-sources) {: #no-sources }
 
 Ignore the `tool.uv.sources` table when resolving dependencies. Used to lock against the
-standards-compliant, publishable package metadata, as opposed to using any local or Git
-sources.
+standards-compliant, publishable package metadata, as opposed to using any local or Git sources.
 
 **Default value**: `false`
 
@@ -938,10 +961,11 @@ sources.
     [tool.uv]
     no-sources = true
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     no-sources = true
     ```
 
@@ -963,10 +987,11 @@ Disable network access, relying only on locally cached data and locally availabl
     [tool.uv]
     offline = true
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     offline = true
     ```
 
@@ -976,9 +1001,9 @@ Disable network access, relying only on locally cached data and locally availabl
 
 The strategy to use when considering pre-release versions.
 
-By default, uv will accept pre-releases for packages that _only_ publish pre-releases,
-along with first-party requirements that contain an explicit pre-release marker in the
-declared specifiers (`if-necessary-or-explicit`).
+By default, uv will accept pre-releases for packages that _only_ publish pre-releases, along with
+first-party requirements that contain an explicit pre-release marker in the declared specifiers
+(`if-necessary-or-explicit`).
 
 **Default value**: `"if-necessary-or-explicit"`
 
@@ -987,8 +1012,10 @@ declared specifiers (`if-necessary-or-explicit`).
 - `"disallow"`: Disallow all pre-release versions
 - `"allow"`: Allow all pre-release versions
 - `"if-necessary"`: Allow pre-release versions if all versions of a package are pre-release
-- `"explicit"`: Allow pre-release versions for first-party packages with explicit pre-release markers in their version requirements
-- `"if-necessary-or-explicit"`: Allow pre-release versions if all versions of a package are pre-release, or if the package has an explicit pre-release marker in its version requirements
+- `"explicit"`: Allow pre-release versions for first-party packages with explicit pre-release
+  markers in their version requirements
+- `"if-necessary-or-explicit"`: Allow pre-release versions if all versions of a package are
+  pre-release, or if the package has an explicit pre-release marker in its version requirements
 
 **Example usage**:
 
@@ -998,10 +1025,11 @@ declared specifiers (`if-necessary-or-explicit`).
     [tool.uv]
     prerelease = "allow"
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     prerelease = "allow"
     ```
 
@@ -1023,10 +1051,11 @@ Whether to enable experimental, preview features.
     [tool.uv]
     preview = true
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     preview = true
     ```
 
@@ -1041,7 +1070,8 @@ Whether to allow Python downloads.
 **Possible values**:
 
 - `"automatic"`: Automatically download managed Python installations when needed
-- `"manual"`: Do not automatically download managed Python installations; require explicit installation
+- `"manual"`: Do not automatically download managed Python installations; require explicit
+  installation
 - `"never"`: Do not ever allow Python downloads
 
 **Example usage**:
@@ -1052,10 +1082,11 @@ Whether to allow Python downloads.
     [tool.uv]
     python-downloads = "manual"
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     python-downloads = "manual"
     ```
 
@@ -1063,8 +1094,8 @@ Whether to allow Python downloads.
 
 ### [`python-preference`](#python-preference) {: #python-preference }
 
-Whether to prefer using Python installations that are already present on the system, or
-those that are downloaded and installed by uv.
+Whether to prefer using Python installations that are already present on the system, or those that
+are downloaded and installed by uv.
 
 **Default value**: `"managed"`
 
@@ -1083,10 +1114,11 @@ those that are downloaded and installed by uv.
     [tool.uv]
     python-preference = "managed"
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     python-preference = "managed"
     ```
 
@@ -1108,10 +1140,11 @@ Reinstall all packages, regardless of whether they're already installed. Implies
     [tool.uv]
     reinstall = true
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     reinstall = true
     ```
 
@@ -1134,10 +1167,11 @@ Reinstall a specific package, regardless of whether it's already installed. Impl
     [tool.uv]
     reinstall-package = ["ruff"]
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     reinstall-package = ["ruff"]
     ```
 
@@ -1145,8 +1179,8 @@ Reinstall a specific package, regardless of whether it's already installed. Impl
 
 ### [`resolution`](#resolution) {: #resolution }
 
-The strategy to use when selecting between the different compatible versions for a given
-package requirement.
+The strategy to use when selecting between the different compatible versions for a given package
+requirement.
 
 By default, uv will use the latest compatible version of each package (`highest`).
 
@@ -1156,7 +1190,8 @@ By default, uv will use the latest compatible version of each package (`highest`
 
 - `"highest"`: Resolve the highest compatible version of each package
 - `"lowest"`: Resolve the lowest compatible version of each package
-- `"lowest-direct"`: Resolve the lowest compatible version of any direct dependencies, and the highest compatible version of any transitive dependencies
+- `"lowest-direct"`: Resolve the lowest compatible version of any direct dependencies, and the
+  highest compatible version of any transitive dependencies
 
 **Example usage**:
 
@@ -1166,10 +1201,11 @@ By default, uv will use the latest compatible version of each package (`highest`
     [tool.uv]
     resolution = "lowest-direct"
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     resolution = "lowest-direct"
     ```
 
@@ -1191,10 +1227,11 @@ Allow package upgrades, ignoring pinned versions in any existing output file.
     [tool.uv]
     upgrade = true
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     upgrade = true
     ```
 
@@ -1202,8 +1239,7 @@ Allow package upgrades, ignoring pinned versions in any existing output file.
 
 ### [`upgrade-package`](#upgrade-package) {: #upgrade-package }
 
-Allow upgrades for a specific package, ignoring pinned versions in any existing output
-file.
+Allow upgrades for a specific package, ignoring pinned versions in any existing output file.
 
 Accepts both standalone package names (`ruff`) and version specifiers (`ruff<0.5.0`).
 
@@ -1219,10 +1255,11 @@ Accepts both standalone package names (`ruff`) and version specifiers (`ruff<0.5
     [tool.uv]
     upgrade-package = ["ruff"]
     ```
+
 === "uv.toml"
 
     ```toml
-    
+
     upgrade-package = ["ruff"]
     ```
 
@@ -1232,10 +1269,11 @@ Accepts both standalone package names (`ruff`) and version specifiers (`ruff<0.5
 
 Settings that are specific to the `uv pip` command-line interface.
 
-These values will be ignored when running commands outside the `uv pip` namespace (e.g.,
-`uv lock`, `uvx`).
+These values will be ignored when running commands outside the `uv pip` namespace (e.g., `uv lock`,
+`uvx`).
 
 #### [`all-extras`](#pip_all-extras) {: #pip_all-extras }
+
 <span id="all-extras"></span>
 
 Include all optional dependencies.
@@ -1254,6 +1292,7 @@ Only applies to `pyproject.toml`, `setup.py`, and `setup.cfg` sources.
     [tool.uv.pip]
     all-extras = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1264,10 +1303,10 @@ Only applies to `pyproject.toml`, `setup.py`, and `setup.cfg` sources.
 ---
 
 #### [`allow-empty-requirements`](#pip_allow-empty-requirements) {: #pip_allow-empty-requirements }
+
 <span id="allow-empty-requirements"></span>
 
-Allow `uv pip sync` with empty requirements, which will clear the environment of all
-packages.
+Allow `uv pip sync` with empty requirements, which will clear the environment of all packages.
 
 **Default value**: `false`
 
@@ -1281,6 +1320,7 @@ packages.
     [tool.uv.pip]
     allow-empty-requirements = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1291,16 +1331,17 @@ packages.
 ---
 
 #### [`allow-insecure-host`](#pip_allow-insecure-host) {: #pip_allow-insecure-host }
+
 <span id="allow-insecure-host"></span>
 
 Allow insecure connections to host.
 
-Expects to receive either a hostname (e.g., `localhost`), a host-port pair (e.g.,
-`localhost:8080`), or a URL (e.g., `https://localhost`).
+Expects to receive either a hostname (e.g., `localhost`), a host-port pair (e.g., `localhost:8080`),
+or a URL (e.g., `https://localhost`).
 
-WARNING: Hosts included in this list will not be verified against the system's certificate
-store. Only use `--allow-insecure-host` in a secure network with verified sources, as it
-bypasses SSL verification and could expose you to MITM attacks.
+WARNING: Hosts included in this list will not be verified against the system's certificate store.
+Only use `--allow-insecure-host` in a secure network with verified sources, as it bypasses SSL
+verification and could expose you to MITM attacks.
 
 **Default value**: `[]`
 
@@ -1314,6 +1355,7 @@ bypasses SSL verification and could expose you to MITM attacks.
     [tool.uv.pip]
     allow-insecure-host = ["localhost:8080"]
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1324,10 +1366,11 @@ bypasses SSL verification and could expose you to MITM attacks.
 ---
 
 #### [`annotation-style`](#pip_annotation-style) {: #pip_annotation-style }
+
 <span id="annotation-style"></span>
 
-The style of the annotation comments included in the output file, used to indicate the
-source of each package.
+The style of the annotation comments included in the output file, used to indicate the source of
+each package.
 
 **Default value**: `"split"`
 
@@ -1344,6 +1387,7 @@ source of each package.
     [tool.uv.pip]
     annotation-style = "line"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1354,14 +1398,15 @@ source of each package.
 ---
 
 #### [`break-system-packages`](#pip_break-system-packages) {: #pip_break-system-packages }
+
 <span id="break-system-packages"></span>
 
 Allow uv to modify an `EXTERNALLY-MANAGED` Python installation.
 
-WARNING: `--break-system-packages` is intended for use in continuous integration (CI)
-environments, when installing into Python installations that are managed by an external
-package manager, like `apt`. It should be used with caution, as such Python installations
-explicitly recommend against modifications by other package managers (like uv or pip).
+WARNING: `--break-system-packages` is intended for use in continuous integration (CI) environments,
+when installing into Python installations that are managed by an external package manager, like
+`apt`. It should be used with caution, as such Python installations explicitly recommend against
+modifications by other package managers (like uv or pip).
 
 **Default value**: `false`
 
@@ -1375,6 +1420,7 @@ explicitly recommend against modifications by other package managers (like uv or
     [tool.uv.pip]
     break-system-packages = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1385,18 +1431,18 @@ explicitly recommend against modifications by other package managers (like uv or
 ---
 
 #### [`compile-bytecode`](#pip_compile-bytecode) {: #pip_compile-bytecode }
+
 <span id="compile-bytecode"></span>
 
 Compile Python files to bytecode after installation.
 
-By default, uv does not compile Python (`.py`) files to bytecode (`__pycache__/*.pyc`);
-instead, compilation is performed lazily the first time a module is imported. For use-cases
-in which start time is critical, such as CLI applications and Docker containers, this option
-can be enabled to trade longer installation times for faster start times.
+By default, uv does not compile Python (`.py`) files to bytecode (`__pycache__/*.pyc`); instead,
+compilation is performed lazily the first time a module is imported. For use-cases in which start
+time is critical, such as CLI applications and Docker containers, this option can be enabled to
+trade longer installation times for faster start times.
 
-When enabled, uv will process the entire site-packages directory (including packages that
-are not being modified by the current operation) for consistency. Like pip, it will also
-ignore errors.
+When enabled, uv will process the entire site-packages directory (including packages that are not
+being modified by the current operation) for consistency. Like pip, it will also ignore errors.
 
 **Default value**: `false`
 
@@ -1410,6 +1456,7 @@ ignore errors.
     [tool.uv.pip]
     compile-bytecode = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1420,10 +1467,11 @@ ignore errors.
 ---
 
 #### [`config-settings`](#pip_config-settings) {: #pip_config-settings }
+
 <span id="config-settings"></span>
 
-Settings to pass to the [PEP 517](https://peps.python.org/pep-0517/) build backend,
-specified as `KEY=VALUE` pairs.
+Settings to pass to the [PEP 517](https://peps.python.org/pep-0517/) build backend, specified as
+`KEY=VALUE` pairs.
 
 **Default value**: `{}`
 
@@ -1437,6 +1485,7 @@ specified as `KEY=VALUE` pairs.
     [tool.uv.pip]
     config-settings = { editable_mode = "compat" }
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1447,6 +1496,7 @@ specified as `KEY=VALUE` pairs.
 ---
 
 #### [`custom-compile-command`](#pip_custom-compile-command) {: #pip_custom-compile-command }
+
 <span id="custom-compile-command"></span>
 
 The header comment to include at the top of the output file generated by `uv pip compile`.
@@ -1465,6 +1515,7 @@ Used to reflect custom build scripts and commands that wrap `uv pip compile`.
     [tool.uv.pip]
     custom-compile-command = "./custom-uv-compile.sh"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1475,6 +1526,7 @@ Used to reflect custom build scripts and commands that wrap `uv pip compile`.
 ---
 
 #### [`emit-build-options`](#pip_emit-build-options) {: #pip_emit-build-options }
+
 <span id="emit-build-options"></span>
 
 Include `--no-binary` and `--only-binary` entries in the output file generated by `uv pip compile`.
@@ -1491,6 +1543,7 @@ Include `--no-binary` and `--only-binary` entries in the output file generated b
     [tool.uv.pip]
     emit-build-options = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1501,6 +1554,7 @@ Include `--no-binary` and `--only-binary` entries in the output file generated b
 ---
 
 #### [`emit-find-links`](#pip_emit-find-links) {: #pip_emit-find-links }
+
 <span id="emit-find-links"></span>
 
 Include `--find-links` entries in the output file generated by `uv pip compile`.
@@ -1517,6 +1571,7 @@ Include `--find-links` entries in the output file generated by `uv pip compile`.
     [tool.uv.pip]
     emit-find-links = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1527,6 +1582,7 @@ Include `--find-links` entries in the output file generated by `uv pip compile`.
 ---
 
 #### [`emit-index-annotation`](#pip_emit-index-annotation) {: #pip_emit-index-annotation }
+
 <span id="emit-index-annotation"></span>
 
 Include comment annotations indicating the index used to resolve each package (e.g.,
@@ -1544,6 +1600,7 @@ Include comment annotations indicating the index used to resolve each package (e
     [tool.uv.pip]
     emit-index-annotation = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1554,9 +1611,11 @@ Include comment annotations indicating the index used to resolve each package (e
 ---
 
 #### [`emit-index-url`](#pip_emit-index-url) {: #pip_emit-index-url }
+
 <span id="emit-index-url"></span>
 
-Include `--index-url` and `--extra-index-url` entries in the output file generated by `uv pip compile`.
+Include `--index-url` and `--extra-index-url` entries in the output file generated by
+`uv pip compile`.
 
 **Default value**: `false`
 
@@ -1570,6 +1629,7 @@ Include `--index-url` and `--extra-index-url` entries in the output file generat
     [tool.uv.pip]
     emit-index-url = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1580,14 +1640,14 @@ Include `--index-url` and `--extra-index-url` entries in the output file generat
 ---
 
 #### [`emit-marker-expression`](#pip_emit-marker-expression) {: #pip_emit-marker-expression }
+
 <span id="emit-marker-expression"></span>
 
-Whether to emit a marker string indicating the conditions under which the set of pinned
-dependencies is valid.
+Whether to emit a marker string indicating the conditions under which the set of pinned dependencies
+is valid.
 
-The pinned dependencies may be valid even when the marker expression is
-false, but when the expression is true, the requirements are known to
-be correct.
+The pinned dependencies may be valid even when the marker expression is false, but when the
+expression is true, the requirements are known to be correct.
 
 **Default value**: `false`
 
@@ -1601,6 +1661,7 @@ be correct.
     [tool.uv.pip]
     emit-marker-expression = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1611,13 +1672,14 @@ be correct.
 ---
 
 #### [`exclude-newer`](#pip_exclude-newer) {: #pip_exclude-newer }
+
 <span id="exclude-newer"></span>
 
 Limit candidate packages to those that were uploaded prior to the given date.
 
 Accepts both [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) timestamps (e.g.,
-`2006-12-02T02:07:43Z`) and local dates in the same format (e.g., `2006-12-02`) in your
-system's configured time zone.
+`2006-12-02T02:07:43Z`) and local dates in the same format (e.g., `2006-12-02`) in your system's
+configured time zone.
 
 **Default value**: `None`
 
@@ -1631,6 +1693,7 @@ system's configured time zone.
     [tool.uv.pip]
     exclude-newer = "2006-12-02"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1641,6 +1704,7 @@ system's configured time zone.
 ---
 
 #### [`extra`](#pip_extra) {: #pip_extra }
+
 <span id="extra"></span>
 
 Include optional dependencies from the extra group name; may be provided more than once.
@@ -1659,6 +1723,7 @@ Only applies to `pyproject.toml`, `setup.py`, and `setup.cfg` sources.
     [tool.uv.pip]
     extra = ["dev", "docs"]
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1669,12 +1734,13 @@ Only applies to `pyproject.toml`, `setup.py`, and `setup.cfg` sources.
 ---
 
 #### [`extra-index-url`](#pip_extra-index-url) {: #pip_extra-index-url }
+
 <span id="extra-index-url"></span>
 
 Extra URLs of package indexes to use, in addition to `--index-url`.
 
-Accepts either a repository compliant with [PEP 503](https://peps.python.org/pep-0503/)
-(the simple repository API), or a local directory laid out in the same format.
+Accepts either a repository compliant with [PEP 503](https://peps.python.org/pep-0503/) (the simple
+repository API), or a local directory laid out in the same format.
 
 All indexes provided via this flag take priority over the index specified by
 [`index_url`](#index-url). When multiple indexes are provided, earlier values take priority.
@@ -1694,6 +1760,7 @@ To control uv's resolution strategy when multiple indexes are present, see
     [tool.uv.pip]
     extra-index-url = ["https://download.pytorch.org/whl/cpu"]
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1704,16 +1771,16 @@ To control uv's resolution strategy when multiple indexes are present, see
 ---
 
 #### [`find-links`](#pip_find-links) {: #pip_find-links }
+
 <span id="find-links"></span>
 
-Locations to search for candidate distributions, in addition to those found in the registry
-indexes.
+Locations to search for candidate distributions, in addition to those found in the registry indexes.
 
-If a path, the target must be a directory that contains packages as wheel files (`.whl`) or
-source distributions (e.g., `.tar.gz` or `.zip`) at the top level.
+If a path, the target must be a directory that contains packages as wheel files (`.whl`) or source
+distributions (e.g., `.tar.gz` or `.zip`) at the top level.
 
-If a URL, the page must contain a flat list of links to package files adhering to the
-formats described above.
+If a URL, the page must contain a flat list of links to package files adhering to the formats
+described above.
 
 **Default value**: `[]`
 
@@ -1727,6 +1794,7 @@ formats described above.
     [tool.uv.pip]
     find-links = ["https://download.pytorch.org/whl/torch_stable.html"]
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1737,6 +1805,7 @@ formats described above.
 ---
 
 #### [`generate-hashes`](#pip_generate-hashes) {: #pip_generate-hashes }
+
 <span id="generate-hashes"></span>
 
 Include distribution hashes in the output file.
@@ -1753,6 +1822,7 @@ Include distribution hashes in the output file.
     [tool.uv.pip]
     generate-hashes = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1763,22 +1833,27 @@ Include distribution hashes in the output file.
 ---
 
 #### [`index-strategy`](#pip_index-strategy) {: #pip_index-strategy }
+
 <span id="index-strategy"></span>
 
 The strategy to use when resolving against multiple index URLs.
 
-By default, uv will stop at the first index on which a given package is available, and
-limit resolutions to those present on that first index (`first-match`). This prevents
-"dependency confusion" attacks, whereby an attack can upload a malicious package under the
-same name to a secondary.
+By default, uv will stop at the first index on which a given package is available, and limit
+resolutions to those present on that first index (`first-match`). This prevents "dependency
+confusion" attacks, whereby an attack can upload a malicious package under the same name to a
+secondary.
 
 **Default value**: `"first-index"`
 
 **Possible values**:
 
-- `"first-index"`: Only use results from the first index that returns a match for a given package name
-- `"unsafe-first-match"`: Search for every package name across all indexes, exhausting the versions from the first index before moving on to the next
-- `"unsafe-best-match"`: Search for every package name across all indexes, preferring the "best" version found. If a package version is in multiple indexes, only look at the entry for the first index
+- `"first-index"`: Only use results from the first index that returns a match for a given package
+  name
+- `"unsafe-first-match"`: Search for every package name across all indexes, exhausting the versions
+  from the first index before moving on to the next
+- `"unsafe-best-match"`: Search for every package name across all indexes, preferring the "best"
+  version found. If a package version is in multiple indexes, only look at the entry for the first
+  index
 
 **Example usage**:
 
@@ -1788,6 +1863,7 @@ same name to a secondary.
     [tool.uv.pip]
     index-strategy = "unsafe-best-match"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1798,12 +1874,13 @@ same name to a secondary.
 ---
 
 #### [`index-url`](#pip_index-url) {: #pip_index-url }
+
 <span id="index-url"></span>
 
 The URL of the Python package index (by default: <https://pypi.org/simple>).
 
-Accepts either a repository compliant with [PEP 503](https://peps.python.org/pep-0503/)
-(the simple repository API), or a local directory laid out in the same format.
+Accepts either a repository compliant with [PEP 503](https://peps.python.org/pep-0503/) (the simple
+repository API), or a local directory laid out in the same format.
 
 The index provided by this setting is given lower priority than any indexes specified via
 [`extra_index_url`](#extra-index-url).
@@ -1820,6 +1897,7 @@ The index provided by this setting is given lower priority than any indexes spec
     [tool.uv.pip]
     index-url = "https://test.pypi.org/simple"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1830,12 +1908,13 @@ The index provided by this setting is given lower priority than any indexes spec
 ---
 
 #### [`keyring-provider`](#pip_keyring-provider) {: #pip_keyring-provider }
+
 <span id="keyring-provider"></span>
 
 Attempt to use `keyring` for authentication for index URLs.
 
-At present, only `--keyring-provider subprocess` is supported, which configures uv to
-use the `keyring` CLI to handle authentication.
+At present, only `--keyring-provider subprocess` is supported, which configures uv to use the
+`keyring` CLI to handle authentication.
 
 **Default value**: `disabled`
 
@@ -1849,6 +1928,7 @@ use the `keyring` CLI to handle authentication.
     [tool.uv.pip]
     keyring-provider = "subprocess"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1859,12 +1939,12 @@ use the `keyring` CLI to handle authentication.
 ---
 
 #### [`link-mode`](#pip_link-mode) {: #pip_link-mode }
+
 <span id="link-mode"></span>
 
 The method to use when installing packages from the global cache.
 
-Defaults to `clone` (also known as Copy-on-Write) on macOS, and `hardlink` on Linux and
-Windows.
+Defaults to `clone` (also known as Copy-on-Write) on macOS, and `hardlink` on Linux and Windows.
 
 **Default value**: `"clone" (macOS) or "hardlink" (Linux, Windows)`
 
@@ -1883,6 +1963,7 @@ Windows.
     [tool.uv.pip]
     link-mode = "copy"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1893,10 +1974,11 @@ Windows.
 ---
 
 #### [`no-annotate`](#pip_no-annotate) {: #pip_no-annotate }
+
 <span id="no-annotate"></span>
 
-Exclude comment annotations indicating the source of each package from the output file
-generated by `uv pip compile`.
+Exclude comment annotations indicating the source of each package from the output file generated by
+`uv pip compile`.
 
 **Default value**: `false`
 
@@ -1910,6 +1992,7 @@ generated by `uv pip compile`.
     [tool.uv.pip]
     no-annotate = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1920,15 +2003,16 @@ generated by `uv pip compile`.
 ---
 
 #### [`no-binary`](#pip_no-binary) {: #pip_no-binary }
+
 <span id="no-binary"></span>
 
 Don't install pre-built wheels.
 
-The given packages will be built and installed from source. The resolver will still use
-pre-built wheels to extract package metadata, if available.
+The given packages will be built and installed from source. The resolver will still use pre-built
+wheels to extract package metadata, if available.
 
-Multiple packages may be provided. Disable binaries for all packages with `:all:`.
-Clear previously specified packages with `:none:`.
+Multiple packages may be provided. Disable binaries for all packages with `:all:`. Clear previously
+specified packages with `:none:`.
 
 **Default value**: `[]`
 
@@ -1942,6 +2026,7 @@ Clear previously specified packages with `:none:`.
     [tool.uv.pip]
     no-binary = ["ruff"]
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1952,13 +2037,14 @@ Clear previously specified packages with `:none:`.
 ---
 
 #### [`no-build`](#pip_no-build) {: #pip_no-build }
+
 <span id="no-build"></span>
 
 Don't build source distributions.
 
-When enabled, resolving will not run arbitrary Python code. The cached wheels of
-already-built source distributions will be reused, but operations that require building
-distributions will exit with an error.
+When enabled, resolving will not run arbitrary Python code. The cached wheels of already-built
+source distributions will be reused, but operations that require building distributions will exit
+with an error.
 
 Alias for `--only-binary :all:`.
 
@@ -1974,6 +2060,7 @@ Alias for `--only-binary :all:`.
     [tool.uv.pip]
     no-build = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -1984,12 +2071,13 @@ Alias for `--only-binary :all:`.
 ---
 
 #### [`no-build-isolation`](#pip_no-build-isolation) {: #pip_no-build-isolation }
+
 <span id="no-build-isolation"></span>
 
 Disable isolation when building source distributions.
 
-Assumes that build dependencies specified by [PEP 518](https://peps.python.org/pep-0518/)
-are already installed.
+Assumes that build dependencies specified by [PEP 518](https://peps.python.org/pep-0518/) are
+already installed.
 
 **Default value**: `false`
 
@@ -2003,6 +2091,7 @@ are already installed.
     [tool.uv.pip]
     no-build-isolation = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2013,12 +2102,13 @@ are already installed.
 ---
 
 #### [`no-build-isolation-package`](#pip_no-build-isolation-package) {: #pip_no-build-isolation-package }
+
 <span id="no-build-isolation-package"></span>
 
 Disable isolation when building source distributions for a specific package.
 
-Assumes that the packages' build dependencies specified by [PEP 518](https://peps.python.org/pep-0518/)
-are already installed.
+Assumes that the packages' build dependencies specified by
+[PEP 518](https://peps.python.org/pep-0518/) are already installed.
 
 **Default value**: `[]`
 
@@ -2032,6 +2122,7 @@ are already installed.
     [tool.uv.pip]
     no-build-isolation-package = ["package1", "package2"]
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2042,10 +2133,11 @@ are already installed.
 ---
 
 #### [`no-deps`](#pip_no-deps) {: #pip_no-deps }
+
 <span id="no-deps"></span>
 
-Ignore package dependencies, instead only add those packages explicitly listed
-on the command line to the resulting the requirements file.
+Ignore package dependencies, instead only add those packages explicitly listed on the command line
+to the resulting the requirements file.
 
 **Default value**: `false`
 
@@ -2059,6 +2151,7 @@ on the command line to the resulting the requirements file.
     [tool.uv.pip]
     no-deps = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2069,10 +2162,11 @@ on the command line to the resulting the requirements file.
 ---
 
 #### [`no-emit-package`](#pip_no-emit-package) {: #pip_no-emit-package }
+
 <span id="no-emit-package"></span>
 
-Specify a package to omit from the output resolution. Its dependencies will still be
-included in the resolution. Equivalent to pip-compile's `--unsafe-package` option.
+Specify a package to omit from the output resolution. Its dependencies will still be included in the
+resolution. Equivalent to pip-compile's `--unsafe-package` option.
 
 **Default value**: `[]`
 
@@ -2086,6 +2180,7 @@ included in the resolution. Equivalent to pip-compile's `--unsafe-package` optio
     [tool.uv.pip]
     no-emit-package = ["ruff"]
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2096,6 +2191,7 @@ included in the resolution. Equivalent to pip-compile's `--unsafe-package` optio
 ---
 
 #### [`no-header`](#pip_no-header) {: #pip_no-header }
+
 <span id="no-header"></span>
 
 Exclude the comment header at the top of output file generated by `uv pip compile`.
@@ -2112,6 +2208,7 @@ Exclude the comment header at the top of output file generated by `uv pip compil
     [tool.uv.pip]
     no-header = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2122,10 +2219,11 @@ Exclude the comment header at the top of output file generated by `uv pip compil
 ---
 
 #### [`no-index`](#pip_no-index) {: #pip_no-index }
+
 <span id="no-index"></span>
 
-Ignore all registry indexes (e.g., PyPI), instead relying on direct URL dependencies and
-those provided via `--find-links`.
+Ignore all registry indexes (e.g., PyPI), instead relying on direct URL dependencies and those
+provided via `--find-links`.
 
 **Default value**: `false`
 
@@ -2139,6 +2237,7 @@ those provided via `--find-links`.
     [tool.uv.pip]
     no-index = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2149,11 +2248,11 @@ those provided via `--find-links`.
 ---
 
 #### [`no-sources`](#pip_no-sources) {: #pip_no-sources }
+
 <span id="no-sources"></span>
 
 Ignore the `tool.uv.sources` table when resolving dependencies. Used to lock against the
-standards-compliant, publishable package metadata, as opposed to using any local or Git
-sources.
+standards-compliant, publishable package metadata, as opposed to using any local or Git sources.
 
 **Default value**: `false`
 
@@ -2167,6 +2266,7 @@ sources.
     [tool.uv.pip]
     no-sources = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2177,13 +2277,14 @@ sources.
 ---
 
 #### [`no-strip-extras`](#pip_no-strip-extras) {: #pip_no-strip-extras }
+
 <span id="no-strip-extras"></span>
 
 Include extras in the output file.
 
-By default, uv strips extras, as any packages pulled in by the extras are already included
-as dependencies in the output file directly. Further, output files generated with
-`--no-strip-extras` cannot be used as constraints files in `install` and `sync` invocations.
+By default, uv strips extras, as any packages pulled in by the extras are already included as
+dependencies in the output file directly. Further, output files generated with `--no-strip-extras`
+cannot be used as constraints files in `install` and `sync` invocations.
 
 **Default value**: `false`
 
@@ -2197,6 +2298,7 @@ as dependencies in the output file directly. Further, output files generated wit
     [tool.uv.pip]
     no-strip-extras = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2207,12 +2309,13 @@ as dependencies in the output file directly. Further, output files generated wit
 ---
 
 #### [`no-strip-markers`](#pip_no-strip-markers) {: #pip_no-strip-markers }
+
 <span id="no-strip-markers"></span>
 
 Include environment markers in the output file generated by `uv pip compile`.
 
-By default, uv strips environment markers, as the resolution generated by `compile` is
-only guaranteed to be correct for the target environment.
+By default, uv strips environment markers, as the resolution generated by `compile` is only
+guaranteed to be correct for the target environment.
 
 **Default value**: `false`
 
@@ -2226,6 +2329,7 @@ only guaranteed to be correct for the target environment.
     [tool.uv.pip]
     no-strip-markers = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2236,16 +2340,17 @@ only guaranteed to be correct for the target environment.
 ---
 
 #### [`only-binary`](#pip_only-binary) {: #pip_only-binary }
+
 <span id="only-binary"></span>
 
 Only use pre-built wheels; don't build source distributions.
 
-When enabled, resolving will not run code from the given packages. The cached wheels of already-built
-source distributions will be reused, but operations that require building distributions will
-exit with an error.
+When enabled, resolving will not run code from the given packages. The cached wheels of
+already-built source distributions will be reused, but operations that require building
+distributions will exit with an error.
 
-Multiple packages may be provided. Disable binaries for all packages with `:all:`.
-Clear previously specified packages with `:none:`.
+Multiple packages may be provided. Disable binaries for all packages with `:all:`. Clear previously
+specified packages with `:none:`.
 
 **Default value**: `[]`
 
@@ -2259,6 +2364,7 @@ Clear previously specified packages with `:none:`.
     [tool.uv.pip]
     only-binary = ["ruff"]
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2269,12 +2375,13 @@ Clear previously specified packages with `:none:`.
 ---
 
 #### [`output-file`](#pip_output-file) {: #pip_output-file }
+
 <span id="output-file"></span>
 
 Write the requirements generated by `uv pip compile` to the given `requirements.txt` file.
 
-If the file already exists, the existing versions will be preferred when resolving
-dependencies, unless `--upgrade` is also specified.
+If the file already exists, the existing versions will be preferred when resolving dependencies,
+unless `--upgrade` is also specified.
 
 **Default value**: `None`
 
@@ -2288,6 +2395,7 @@ dependencies, unless `--upgrade` is also specified.
     [tool.uv.pip]
     output-file = "requirements.txt"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2298,15 +2406,15 @@ dependencies, unless `--upgrade` is also specified.
 ---
 
 #### [`prefix`](#pip_prefix) {: #pip_prefix }
+
 <span id="prefix"></span>
 
-Install packages into `lib`, `bin`, and other top-level folders under the specified
-directory, as if a virtual environment were present at that location.
+Install packages into `lib`, `bin`, and other top-level folders under the specified directory, as if
+a virtual environment were present at that location.
 
-In general, prefer the use of `--python` to install into an alternate environment, as
-scripts and other artifacts installed via `--prefix` will reference the installing
-interpreter, rather than any interpreter added to the `--prefix` directory, rendering them
-non-portable.
+In general, prefer the use of `--python` to install into an alternate environment, as scripts and
+other artifacts installed via `--prefix` will reference the installing interpreter, rather than any
+interpreter added to the `--prefix` directory, rendering them non-portable.
 
 **Default value**: `None`
 
@@ -2320,6 +2428,7 @@ non-portable.
     [tool.uv.pip]
     prefix = "./prefix"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2330,13 +2439,14 @@ non-portable.
 ---
 
 #### [`prerelease`](#pip_prerelease) {: #pip_prerelease }
+
 <span id="prerelease"></span>
 
 The strategy to use when considering pre-release versions.
 
-By default, uv will accept pre-releases for packages that _only_ publish pre-releases,
-along with first-party requirements that contain an explicit pre-release marker in the
-declared specifiers (`if-necessary-or-explicit`).
+By default, uv will accept pre-releases for packages that _only_ publish pre-releases, along with
+first-party requirements that contain an explicit pre-release marker in the declared specifiers
+(`if-necessary-or-explicit`).
 
 **Default value**: `"if-necessary-or-explicit"`
 
@@ -2345,8 +2455,10 @@ declared specifiers (`if-necessary-or-explicit`).
 - `"disallow"`: Disallow all pre-release versions
 - `"allow"`: Allow all pre-release versions
 - `"if-necessary"`: Allow pre-release versions if all versions of a package are pre-release
-- `"explicit"`: Allow pre-release versions for first-party packages with explicit pre-release markers in their version requirements
-- `"if-necessary-or-explicit"`: Allow pre-release versions if all versions of a package are pre-release, or if the package has an explicit pre-release marker in its version requirements
+- `"explicit"`: Allow pre-release versions for first-party packages with explicit pre-release
+  markers in their version requirements
+- `"if-necessary-or-explicit"`: Allow pre-release versions if all versions of a package are
+  pre-release, or if the package has an explicit pre-release marker in its version requirements
 
 **Example usage**:
 
@@ -2356,6 +2468,7 @@ declared specifiers (`if-necessary-or-explicit`).
     [tool.uv.pip]
     prerelease = "allow"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2366,18 +2479,19 @@ declared specifiers (`if-necessary-or-explicit`).
 ---
 
 #### [`python`](#pip_python) {: #pip_python }
+
 <span id="python"></span>
 
 The Python interpreter into which packages should be installed.
 
-By default, uv installs into the virtual environment in the current working directory or
-any parent directory. The `--python` option allows you to specify a different interpreter,
-which is intended for use in continuous integration (CI) environments or other automated
-workflows.
+By default, uv installs into the virtual environment in the current working directory or any parent
+directory. The `--python` option allows you to specify a different interpreter, which is intended
+for use in continuous integration (CI) environments or other automated workflows.
 
 Supported formats:
-- `3.10` looks for an installed Python 3.10 in the registry on Windows (see
-  `py --list-paths`), or `python3.10` on Linux and macOS.
+
+- `3.10` looks for an installed Python 3.10 in the registry on Windows (see `py --list-paths`), or
+  `python3.10` on Linux and macOS.
 - `python3.10` or `python.exe` looks for a binary with the given name in `PATH`.
 - `/home/ferris/.local/bin/python3.10` uses the exact Python at the given path.
 
@@ -2393,6 +2507,7 @@ Supported formats:
     [tool.uv.pip]
     python = "3.10"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2403,13 +2518,13 @@ Supported formats:
 ---
 
 #### [`python-platform`](#pip_python-platform) {: #pip_python-platform }
+
 <span id="python-platform"></span>
 
 The platform for which requirements should be resolved.
 
-Represented as a "target triple", a string that describes the target platform in terms of
-its CPU, vendor, and operating system name, like `x86_64-unknown-linux-gnu` or
-`aarch64-apple-darwin`.
+Represented as a "target triple", a string that describes the target platform in terms of its CPU,
+vendor, and operating system name, like `x86_64-unknown-linux-gnu` or `aarch64-apple-darwin`.
 
 **Default value**: `None`
 
@@ -2423,6 +2538,7 @@ its CPU, vendor, and operating system name, like `x86_64-unknown-linux-gnu` or
     [tool.uv.pip]
     python-platform = "x86_64-unknown-linux-gnu"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2433,13 +2549,14 @@ its CPU, vendor, and operating system name, like `x86_64-unknown-linux-gnu` or
 ---
 
 #### [`python-version`](#pip_python-version) {: #pip_python-version }
+
 <span id="python-version"></span>
 
-The minimum Python version that should be supported by the resolved requirements (e.g.,
-`3.8` or `3.8.17`).
+The minimum Python version that should be supported by the resolved requirements (e.g., `3.8` or
+`3.8.17`).
 
-If a patch version is omitted, the minimum patch version is assumed. For example, `3.8` is
-mapped to `3.8.0`.
+If a patch version is omitted, the minimum patch version is assumed. For example, `3.8` is mapped to
+`3.8.0`.
 
 **Default value**: `None`
 
@@ -2453,6 +2570,7 @@ mapped to `3.8.0`.
     [tool.uv.pip]
     python-version = "3.8"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2463,6 +2581,7 @@ mapped to `3.8.0`.
 ---
 
 #### [`reinstall`](#pip_reinstall) {: #pip_reinstall }
+
 <span id="reinstall"></span>
 
 Reinstall all packages, regardless of whether they're already installed. Implies `refresh`.
@@ -2479,6 +2598,7 @@ Reinstall all packages, regardless of whether they're already installed. Implies
     [tool.uv.pip]
     reinstall = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2489,6 +2609,7 @@ Reinstall all packages, regardless of whether they're already installed. Implies
 ---
 
 #### [`reinstall-package`](#pip_reinstall-package) {: #pip_reinstall-package }
+
 <span id="reinstall-package"></span>
 
 Reinstall a specific package, regardless of whether it's already installed. Implies
@@ -2506,6 +2627,7 @@ Reinstall a specific package, regardless of whether it's already installed. Impl
     [tool.uv.pip]
     reinstall-package = ["ruff"]
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2516,20 +2638,21 @@ Reinstall a specific package, regardless of whether it's already installed. Impl
 ---
 
 #### [`require-hashes`](#pip_require-hashes) {: #pip_require-hashes }
+
 <span id="require-hashes"></span>
 
 Require a matching hash for each requirement.
 
-Hash-checking mode is all or nothing. If enabled, _all_ requirements must be provided
-with a corresponding hash or set of hashes. Additionally, if enabled, _all_ requirements
-must either be pinned to exact versions (e.g., `==1.0.0`), or be specified via direct URL.
+Hash-checking mode is all or nothing. If enabled, _all_ requirements must be provided with a
+corresponding hash or set of hashes. Additionally, if enabled, _all_ requirements must either be
+pinned to exact versions (e.g., `==1.0.0`), or be specified via direct URL.
 
 Hash-checking mode introduces a number of additional constraints:
 
 - Git dependencies are not supported.
 - Editable installs are not supported.
-- Local dependencies are not supported, unless they point to a specific wheel (`.whl`) or
-  source archive (`.zip`, `.tar.gz`), as opposed to a directory.
+- Local dependencies are not supported, unless they point to a specific wheel (`.whl`) or source
+  archive (`.zip`, `.tar.gz`), as opposed to a directory.
 
 **Default value**: `false`
 
@@ -2543,6 +2666,7 @@ Hash-checking mode introduces a number of additional constraints:
     [tool.uv.pip]
     require-hashes = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2553,10 +2677,11 @@ Hash-checking mode introduces a number of additional constraints:
 ---
 
 #### [`resolution`](#pip_resolution) {: #pip_resolution }
+
 <span id="resolution"></span>
 
-The strategy to use when selecting between the different compatible versions for a given
-package requirement.
+The strategy to use when selecting between the different compatible versions for a given package
+requirement.
 
 By default, uv will use the latest compatible version of each package (`highest`).
 
@@ -2566,7 +2691,8 @@ By default, uv will use the latest compatible version of each package (`highest`
 
 - `"highest"`: Resolve the highest compatible version of each package
 - `"lowest"`: Resolve the lowest compatible version of each package
-- `"lowest-direct"`: Resolve the lowest compatible version of any direct dependencies, and the highest compatible version of any transitive dependencies
+- `"lowest-direct"`: Resolve the lowest compatible version of any direct dependencies, and the
+  highest compatible version of any transitive dependencies
 
 **Example usage**:
 
@@ -2576,6 +2702,7 @@ By default, uv will use the latest compatible version of each package (`highest`
     [tool.uv.pip]
     resolution = "lowest-direct"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2586,10 +2713,10 @@ By default, uv will use the latest compatible version of each package (`highest`
 ---
 
 #### [`strict`](#pip_strict) {: #pip_strict }
+
 <span id="strict"></span>
 
-Validate the Python environment, to detect packages with missing dependencies and other
-issues.
+Validate the Python environment, to detect packages with missing dependencies and other issues.
 
 **Default value**: `false`
 
@@ -2603,6 +2730,7 @@ issues.
     [tool.uv.pip]
     strict = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2613,16 +2741,17 @@ issues.
 ---
 
 #### [`system`](#pip_system) {: #pip_system }
+
 <span id="system"></span>
 
 Install packages into the system Python environment.
 
-By default, uv installs into the virtual environment in the current working directory or
-any parent directory. The `--system` option instructs uv to instead use the first Python
-found in the system `PATH`.
+By default, uv installs into the virtual environment in the current working directory or any parent
+directory. The `--system` option instructs uv to instead use the first Python found in the system
+`PATH`.
 
-WARNING: `--system` is intended for use in continuous integration (CI) environments and
-should be used with caution, as it can modify the system Python installation.
+WARNING: `--system` is intended for use in continuous integration (CI) environments and should be
+used with caution, as it can modify the system Python installation.
 
 **Default value**: `false`
 
@@ -2636,6 +2765,7 @@ should be used with caution, as it can modify the system Python installation.
     [tool.uv.pip]
     system = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2646,6 +2776,7 @@ should be used with caution, as it can modify the system Python installation.
 ---
 
 #### [`target`](#pip_target) {: #pip_target }
+
 <span id="target"></span>
 
 Install packages into the specified directory, rather than into the virtual or system Python
@@ -2663,6 +2794,7 @@ environment. The packages will be installed at the top-level of the directory.
     [tool.uv.pip]
     target = "./target"
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2673,15 +2805,15 @@ environment. The packages will be installed at the top-level of the directory.
 ---
 
 #### [`universal`](#pip_universal) {: #pip_universal }
+
 <span id="universal"></span>
 
-Perform a universal resolution, attempting to generate a single `requirements.txt` output
-file that is compatible with all operating systems, architectures, and Python
-implementations.
+Perform a universal resolution, attempting to generate a single `requirements.txt` output file that
+is compatible with all operating systems, architectures, and Python implementations.
 
-In universal mode, the current Python version (or user-provided `--python-version`) will be
-treated as a lower bound. For example, `--universal --python-version 3.7` would produce a
-universal resolution for Python 3.7 and later.
+In universal mode, the current Python version (or user-provided `--python-version`) will be treated
+as a lower bound. For example, `--universal --python-version 3.7` would produce a universal
+resolution for Python 3.7 and later.
 
 **Default value**: `false`
 
@@ -2695,6 +2827,7 @@ universal resolution for Python 3.7 and later.
     [tool.uv.pip]
     universal = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2705,6 +2838,7 @@ universal resolution for Python 3.7 and later.
 ---
 
 #### [`upgrade`](#pip_upgrade) {: #pip_upgrade }
+
 <span id="upgrade"></span>
 
 Allow package upgrades, ignoring pinned versions in any existing output file.
@@ -2721,6 +2855,7 @@ Allow package upgrades, ignoring pinned versions in any existing output file.
     [tool.uv.pip]
     upgrade = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2731,10 +2866,10 @@ Allow package upgrades, ignoring pinned versions in any existing output file.
 ---
 
 #### [`upgrade-package`](#pip_upgrade-package) {: #pip_upgrade-package }
+
 <span id="upgrade-package"></span>
 
-Allow upgrades for a specific package, ignoring pinned versions in any existing output
-file.
+Allow upgrades for a specific package, ignoring pinned versions in any existing output file.
 
 Accepts both standalone package names (`ruff`) and version specifiers (`ruff<0.5.0`).
 
@@ -2750,6 +2885,7 @@ Accepts both standalone package names (`ruff`) and version specifiers (`ruff<0.5
     [tool.uv.pip]
     upgrade-package = ["ruff"]
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2760,13 +2896,13 @@ Accepts both standalone package names (`ruff`) and version specifiers (`ruff<0.5
 ---
 
 #### [`verify-hashes`](#pip_verify-hashes) {: #pip_verify-hashes }
+
 <span id="verify-hashes"></span>
 
 Validate any hashes provided in the requirements file.
 
-Unlike `--require-hashes`, `--verify-hashes` does not require that all requirements have
-hashes; instead, it will limit itself to verifying the hashes of those requirements that do
-include them.
+Unlike `--require-hashes`, `--verify-hashes` does not require that all requirements have hashes;
+instead, it will limit itself to verifying the hashes of those requirements that do include them.
 
 **Default value**: `false`
 
@@ -2780,6 +2916,7 @@ include them.
     [tool.uv.pip]
     verify-hashes = true
     ```
+
 === "uv.toml"
 
     ```toml
@@ -2788,4 +2925,3 @@ include them.
     ```
 
 ---
-
