@@ -352,9 +352,14 @@ uv run [OPTIONS] <COMMAND>
 
 </dd><dt><code>--version</code>, <code>-V</code></dt><dd><p>Display the uv version</p>
 
-</dd><dt><code>--with</code> <i>with</i></dt><dd><p>Run with the given packages installed.</p>
+<dt><code>--with</code> <i>with</i></dt>
+<dd>
+<p>Run with the specified package and its dependencies. To include multiple dependencies, use the --with flag for each one:</p>
+<code>--with <i>dep1</i> --with <i>dep2</i> --with <i>dep3</i></code>...</p>
 
-<p>When used in a project, these dependencies will be layered on top of the project environment in a separate, ephemeral environment. These dependencies are allowed to conflict with those specified by the project.</p>
+<p>This installs all specified dependencies.</p>
+</dd>
+
 
 </dd><dt><code>--with-editable</code> <i>with-editable</i></dt><dd><p>Run with the given packages installed as editables</p>
 
