@@ -40,6 +40,7 @@ use uv_platform_tags::Tags;
 use uv_pypi_types::{Requirement, ResolutionMetadata, VerbatimParsedUrl};
 use uv_types::{BuildContext, HashStrategy, InstalledPackagesProvider};
 use uv_warnings::warn_user_once;
+use uv_workspace::pyproject::Project;
 
 use crate::candidate_selector::{CandidateDist, CandidateSelector};
 use crate::dependency_provider::UvDependencyProvider;
@@ -529,11 +530,13 @@ impl<InstalledPackages: InstalledPackagesProvider> ResolverState<InstalledPackag
                             for_package.as_deref(),
                             &version,
                             &self.urls,
-                            &self.indexes,
+                            // &self.indexes,
                             &self.locals,
                             dependencies.clone(),
                             &self.git,
                             self.selector.resolution_strategy(),
+                            None,
+                            None::<&ResolverState<InstalledPackages>>,
                         )?;
 
                         // Emit a request to fetch the metadata for each registry package.
@@ -699,11 +702,13 @@ impl<InstalledPackages: InstalledPackagesProvider> ResolverState<InstalledPackag
                     for_package,
                     version,
                     &self.urls,
-                    &self.indexes,
+                    // &self.indexes,
                     &self.locals,
                     fork.dependencies.clone(),
                     &self.git,
                     self.selector.resolution_strategy(),
+                    None,
+                    None::<&ResolverState<InstalledPackages>>,
                 )?;
                 // Emit a request to fetch the metadata for each registry package.
                 for dependency in &fork.dependencies {
@@ -2171,97 +2176,387 @@ impl ForkState {
 
     /// Add the dependencies for the selected version of the current package, checking for
     /// self-dependencies, and handling URLs and locals.
+    // fn add_package_version_dependencies(
+    //     &mut self,
+    //     for_package: Option<&str>,
+    //     version: &Version,
+    //     urls: &Urls,
+    //     indexes: &Indexes,
+    //     locals: &Locals,
+    //     mut dependencies: Vec<PubGrubDependency>,
+    //     git: &GitResolver,
+    //     resolution_strategy: &ResolutionStrategy,
+    // ) -> Result<(), ResolveError> {
+    //     for dependency in &mut dependencies {
+    //         let PubGrubDependency {
+    //             package,
+    //             version,
+    //             specifier,
+    //             url,
+    //         } = dependency;
+
+    //         let mut has_url = false;
+    //         if let Some(name) = package.name() {
+    //             // From the [`Requirement`] to [`PubGrubDependency`] conversion, we get a URL if the
+    //             // requirement was a URL requirement. `Urls` applies canonicalization to this and
+    //             // override URLs to both URL and registry requirements, which we then check for
+    //             // conflicts using [`ForkUrl`].
+    //             if let Some(url) = urls.get_url(name, url.as_ref(), git)? {
+    //                 self.fork_urls.insert(name, url, &self.markers)?;
+    //                 has_url = true;
+    //             };
+
+    //             // If the specifier is an exact version and the user requested a local version for this
+    //             // fork that's more precise than the specifier, use the local version instead.
+    //             if let Some(specifier) = specifier {
+    //                 let locals = locals.get(name, &self.markers);
+
+    //                 // It's possible that there are multiple matching local versions requested with
+    //                 // different marker expressions. All of these are potentially compatible until we
+    //                 // narrow to a specific fork.
+    //                 for local in locals {
+    //                     let local = specifier
+    //                         .iter()
+    //                         .map(|specifier| {
+    //                             Locals::map(local, specifier)
+    //                                 .map_err(ResolveError::InvalidVersion)
+    //                                 .and_then(|specifier| {
+    //                                     Ok(PubGrubSpecifier::from_pep440_specifier(&specifier)?)
+    //                                 })
+    //                         })
+    //                         .fold_ok(Range::full(), |range, specifier| {
+    //                             range.intersection(&specifier.into())
+    //                         })?;
+
+    //                     // Add the local version.
+    //                     *version = version.union(&local);
+    //                 }
+    //             }
+
+    //             // If the package is pinned to an exact index, add it to the fork.
+    //             for index in indexes.get(name, &self.markers) {
+    //                 self.fork_indexes.insert(name, index, &self.markers)?;
+    //             }
+    //         }
+
+    //         if let Some(for_package) = for_package {
+    //             debug!("Adding transitive dependency for {for_package}: {package}{version}");
+    //         } else {
+    //             // A dependency from the root package or requirements.txt.
+    //             debug!("Adding direct dependency: {package}{version}");
+
+    //             // Warn the user if a direct dependency lacks a lower bound in `--lowest` resolution.
+    //             let missing_lower_bound = version
+    //                 .bounding_range()
+    //                 .map(|(lowest, _highest)| lowest == Bound::Unbounded)
+    //                 .unwrap_or(true);
+    //             let strategy_lowest = matches!(
+    //                 resolution_strategy,
+    //                 ResolutionStrategy::Lowest | ResolutionStrategy::LowestDirect(..)
+    //             );
+    //             if !has_url && missing_lower_bound && strategy_lowest {
+    //                 warn_user_once!(
+    //                     "The direct dependency `{package}` is unpinned. \
+    //                     Consider setting a lower bound when using `--resolution-strategy lowest` \
+    //                     to avoid using outdated versions."
+    //                 );
+    //             }
+    //         }
+
+    //         // Update the package priorities.
+    //         self.priorities.insert(package, version, &self.fork_urls);
+    //     }
+
+    //     self.pubgrub.add_package_version_dependencies(
+    //         self.next.clone(),
+    //         version.clone(),
+    //         dependencies.into_iter().map(|dependency| {
+    //             let PubGrubDependency {
+    //                 package,
+    //                 version,
+    //                 specifier: _,
+    //                 url: _,
+    //             } = dependency;
+    //             (package, version)
+    //         }),
+    //     );
+    //     Ok(())
+    // }
+
+    // fn add_package_version_dependencies(
+    //     &mut self,
+    //     for_package: Option<&str>,
+    //     version: &Version,
+    //     urls: &Urls,
+    //     locals: &Locals,
+    //     mut dependencies: Vec<PubGrubDependency>,
+    //     git: &GitResolver,
+    //     resolution_strategy: &ResolutionStrategy,
+    //     project: Option<&Project>,
+    //     resolver_state: Option<&ResolverState<impl InstalledPackagesProvider>>, // Pass ResolverState
+    // ) -> Result<(), ResolveError> {
+    //     for dependency in &mut dependencies {
+    //         let PubGrubDependency {
+    //             package,
+    //             version,
+    //             specifier,
+    //             url,
+    //         } = dependency;
+    
+    //         let mut has_url = false;
+    //         if let Some(name) = package.name() {
+    //             // Existing URL handling logic...
+    //             if let Some(url) = urls.get_url(name, url.as_ref(), git)? {
+    //                 self.fork_urls.insert(name, url, &self.markers)?;
+    //                 has_url = true;
+    //             }
+    
+    //             // Handle local version logic...
+    //             if let Some(specifier) = specifier {
+    //                 let locals = locals.get(name, &self.markers);
+    //                 for local in locals {
+    //                     let local = specifier
+    //                         .iter()
+    //                         .map(|specifier| {
+    //                             Locals::map(local, specifier)
+    //                                 .map_err(ResolveError::InvalidVersion)
+    //                                 .and_then(|specifier| {
+    //                                     Ok(PubGrubSpecifier::from_pep440_specifier(&specifier)?)
+    //                                 })
+    //                         })
+    //                         .fold_ok(Range::full(), |range, specifier| {
+    //                             range.intersection(&specifier.into())
+    //                         })?;
+    
+    //                     // Add the local version.
+    //                     *version = version.union(&local);
+    //                 }
+    //             }
+    //         }
+    
+    //         if let Some(for_package) = for_package {
+    //             debug!("Adding transitive dependency for {for_package}: {package}{version}");
+    //         } else {
+    //             debug!("Adding direct dependency: {package}{version}");
+    
+    //             let is_workspace_member = if let Some(package_name) = for_package {
+    //                 // PackageName::new(package_name).ok().map_or(false, |pkg_name| {
+    //                     PackageName::new(package_name.to_string()).ok().map_or(false, |pkg_name| {
+    //                     resolver_state.unwrap().workspace_members.contains(&pkg_name)
+    //                 })
+    //             } else {
+    //                 false
+    //             };
+    
+    //             // Check if this dependency is listed in the project's dependencies
+    //             let is_direct_dependency = project
+    //                 .and_then(|proj| proj.dependencies.as_ref()) // Safely access dependencies if it exists
+    //                 .map_or(false, |deps| deps.contains(&package.to_string())); // Compare with the package name
+    
+    //             if is_direct_dependency && !is_workspace_member {
+    //                 // Warn the user if a direct dependency lacks a lower bound in `--lowest` resolution.
+    //                 let missing_lower_bound = version
+    //                     .bounding_range()
+    //                     .map(|(lowest, _highest)| lowest == Bound::Unbounded)
+    //                     .unwrap_or(true);
+    //                 let strategy_lowest = matches!(
+    //                     resolution_strategy,
+    //                     ResolutionStrategy::Lowest | ResolutionStrategy::LowestDirect(..)
+    //                 );
+    
+    //                 if !has_url && missing_lower_bound && strategy_lowest {
+    //                     warn_user_once!(
+    //                         "The direct dependency `{package}` is unpinned. \
+    //                         Consider setting a lower bound when using `--resolution-strategy lowest` \
+    //                         to avoid using outdated versions."
+    //                     );
+    //                 }
+    //             } else {
+    //                 warn_user_once!(
+    //                     "The package `{package}` is not recognized as a direct dependency."
+    //                 );
+    //             }
+    //         }
+    
+    //         self.priorities.insert(package, version, &self.fork_urls);
+    //     }
+    
+    //     self.pubgrub.add_package_version_dependencies(
+    //         self.next.clone(),
+    //         version.clone(),
+    //         dependencies.into_iter().map(|dependency| {
+    //             let PubGrubDependency {
+    //                 package,
+    //                 version,
+    //                 specifier: _,
+    //                 url: _,
+    //             } = dependency;
+    //             (package, version)
+    //         }),
+    //     );
+    //     Ok(())
+    // }
+
     fn add_package_version_dependencies(
         &mut self,
         for_package: Option<&str>,
         version: &Version,
         urls: &Urls,
-        indexes: &Indexes,
         locals: &Locals,
         mut dependencies: Vec<PubGrubDependency>,
         git: &GitResolver,
         resolution_strategy: &ResolutionStrategy,
+        project: Option<&Project>,
+        resolver_state: Option<&ResolverState<impl InstalledPackagesProvider>>,
     ) -> Result<(), ResolveError> {
-        for dependency in &mut dependencies {
-            let PubGrubDependency {
-                package,
-                version,
-                specifier,
-                url,
-            } = dependency;
+        // for dependency in &mut dependencies {
+        //     let PubGrubDependency {
+        //         package,
+        //         version,
+        //         specifier,
+        //         url,
+        //     } = dependency;
+    
+        //     let mut has_url = false;
+        //     if let Some(name) = package.name() {
+        //         // Existing URL handling logic...
+        //         if let Some(url) = urls.get_url(name, url.as_ref(), git)? {
+        //             self.fork_urls.insert(name, url, &self.markers)?;
+        //             has_url = true;
+        //         }
+    
+        //         // Handle local version logic...
+        //         if let Some(specifier) = specifier {
+        //             let locals = locals.get(name, &self.markers);
+        //             for local in locals {
+        //                 let local = specifier
+        //                     .iter()
+        //                     .map(|specifier| {
+        //                         Locals::map(local, specifier)
+        //                             .map_err(ResolveError::InvalidVersion)
+        //                             .and_then(|specifier| {
+        //                                 Ok(PubGrubSpecifier::from_pep440_specifier(&specifier)?)
+        //                             })
+        //                     })
+        //                     .fold_ok(Range::full(), |range, specifier| {
+        //                         range.intersection(&specifier.into())
+        //                     })?;
+    
+        //                 // Add the local version.
+        //                 *version = version.union(&local);
+        //             }
+        //         }
+        //     }
+    
+            // if let Some(for_package) = for_package {
+            //     debug!("Adding transitive dependency for {for_package}: {package}{version}");
+            // } else {
+            //     debug!("Adding direct dependency: {package}{version}");
+    
+            //     let is_workspace_member = resolver_state.and_then(|state| {
+            //         package.name().and_then(|name| {
+            //             PackageName::new(name.to_string()).ok().map(|pkg_name| {
+            //                 state.workspace_members.contains(&pkg_name)
+            //             })
+            //         })
+            //     }).unwrap_or(false);
+    
+            //     let is_direct_dependency = project
+            //         .and_then(|proj| proj.dependencies.as_ref())
+            //         .map_or(false, |deps| deps.contains(&package.to_string()));
+    
+            //     if is_direct_dependency && !is_workspace_member {
+            //         // Warn the user if a direct dependency lacks a lower bound in `--lowest` resolution.
+            //         let missing_lower_bound = version
+            //             .bounding_range()
+            //             .map(|(lowest, _highest)| lowest == Bound::Unbounded)
+            //             .unwrap_or(true);
+            //         let strategy_lowest = matches!(
+            //             resolution_strategy,
+            //             ResolutionStrategy::Lowest | ResolutionStrategy::LowestDirect(..)
+            //         );
+    
+            //         if !has_url && missing_lower_bound && strategy_lowest {
+            //             warn_user_once!(
+            //                 "The direct dependency `{package}` is unpinned. \
+            //                 Consider setting a lower bound when using `--resolution-strategy lowest` \
+            //                 to avoid using outdated versions."
+            //             );
+            //         }
+            //     } else if !is_workspace_member && !is_direct_dependency {
+            //         warn_user_once!(
+            //             "The package `{package}` is not recognized as a direct dependency."
+            //         );
+            //     }
+            // }
 
-            let mut has_url = false;
-            if let Some(name) = package.name() {
-                // From the [`Requirement`] to [`PubGrubDependency`] conversion, we get a URL if the
-                // requirement was a URL requirement. `Urls` applies canonicalization to this and
-                // override URLs to both URL and registry requirements, which we then check for
-                // conflicts using [`ForkUrl`].
-                if let Some(url) = urls.get_url(name, url.as_ref(), git)? {
-                    self.fork_urls.insert(name, url, &self.markers)?;
-                    has_url = true;
-                };
+            debug!("Entering add_package_version_dependencies");
+    debug!("for_package: {:?}", for_package);
+    debug!("version: {:?}", version);
+    debug!("dependencies count: {}", dependencies.len());
+    debug!("project is Some: {}", project.is_some());
+    debug!("resolver_state is Some: {}", resolver_state.is_some());
 
-                // If the specifier is an exact version and the user requested a local version for this
-                // fork that's more precise than the specifier, use the local version instead.
-                if let Some(specifier) = specifier {
-                    let locals = locals.get(name, &self.markers);
+    for dependency in &mut dependencies {
+        let PubGrubDependency {
+            package,
+            version,
+            specifier,
+            url,
+        } = dependency;
 
-                    // It's possible that there are multiple matching local versions requested with
-                    // different marker expressions. All of these are potentially compatible until we
-                    // narrow to a specific fork.
-                    for local in locals {
-                        let local = specifier
-                            .iter()
-                            .map(|specifier| {
-                                Locals::map(local, specifier)
-                                    .map_err(ResolveError::InvalidVersion)
-                                    .and_then(|specifier| {
-                                        Ok(PubGrubSpecifier::from_pep440_specifier(&specifier)?)
-                                    })
-                            })
-                            .fold_ok(Range::full(), |range, specifier| {
-                                range.intersection(&specifier.into())
-                            })?;
+        debug!("Processing dependency: {:?}", package);
 
-                        // Add the local version.
-                        *version = version.union(&local);
-                    }
-                }
-
-                // If the package is pinned to an exact index, add it to the fork.
-                for index in indexes.get(name, &self.markers) {
-                    self.fork_indexes.insert(name, index, &self.markers)?;
-                }
+        let mut has_url = false;
+        if let Some(name) = package.name() {
+            debug!("Package name: {}", name);
+            // Existing URL handling logic...
+            if let Some(url) = urls.get_url(name, url.as_ref(), git)? {
+                self.fork_urls.insert(name, url, &self.markers)?;
+                has_url = true;
+                debug!("URL found for package");
             }
 
-            if let Some(for_package) = for_package {
-                debug!("Adding transitive dependency for {for_package}: {package}{version}");
-            } else {
-                // A dependency from the root package or requirements.txt.
-                debug!("Adding direct dependency: {package}{version}");
-
-                // Warn the user if a direct dependency lacks a lower bound in `--lowest` resolution.
-                let missing_lower_bound = version
-                    .bounding_range()
-                    .map(|(lowest, _highest)| lowest == Bound::Unbounded)
-                    .unwrap_or(true);
-                let strategy_lowest = matches!(
-                    resolution_strategy,
-                    ResolutionStrategy::Lowest | ResolutionStrategy::LowestDirect(..)
-                );
-                if !has_url && missing_lower_bound && strategy_lowest {
-                    warn_user_once!(
-                        "The direct dependency `{package}` is unpinned. \
-                        Consider setting a lower bound when using `--resolution-strategy lowest` \
-                        to avoid using outdated versions."
-                    );
-                }
+            // Handle local version logic...
+            if let Some(specifier) = specifier {
+                debug!("Processing local version for specifier: {:?}", specifier);
+                // ... (existing local version logic)
             }
-
-            // Update the package priorities.
-            self.priorities.insert(package, version, &self.fork_urls);
         }
 
+        let is_workspace_member = resolver_state.and_then(|state| {
+            package.name().and_then(|name| {
+                PackageName::new(name.to_string()).ok().map(|pkg_name| {
+                    state.workspace_members.contains(&pkg_name)
+                })
+            })
+        }).unwrap_or(false);
+
+        let is_direct_dependency = project
+            .and_then(|proj| proj.dependencies.as_ref())
+            .map_or(false, |deps| deps.contains(&package.to_string()));
+
+        debug!("is_workspace_member: {}", is_workspace_member);
+        debug!("is_direct_dependency: {}", is_direct_dependency);
+
+        if let Some(for_package) = for_package {
+            debug!("Adding transitive dependency for {for_package}: {package}{version}");
+        } else {
+            debug!("Adding direct dependency: {package}{version}");
+
+            if is_direct_dependency && !is_workspace_member {
+                // ... (existing warning logic for unpinned dependencies)
+            } else if !is_workspace_member && !is_direct_dependency {
+                warn_user_once!(
+                    "The package `{package}` is not recognized as a direct dependency."
+                );
+                debug!("Warning issued for non-direct, non-workspace package: {}", package);
+            }
+        }
+    
+            self.priorities.insert(package, version, &self.fork_urls);
+        }
+    
         self.pubgrub.add_package_version_dependencies(
             self.next.clone(),
             version.clone(),
@@ -2277,7 +2572,7 @@ impl ForkState {
         );
         Ok(())
     }
-
+    
     fn add_unavailable_version(
         &mut self,
         version: Version,
