@@ -2302,7 +2302,7 @@ impl ForkState {
     //             specifier,
     //             url,
     //         } = dependency;
-    
+
     //         let mut has_url = false;
     //         if let Some(name) = package.name() {
     //             // Existing URL handling logic...
@@ -2310,7 +2310,7 @@ impl ForkState {
     //                 self.fork_urls.insert(name, url, &self.markers)?;
     //                 has_url = true;
     //             }
-    
+
     //             // Handle local version logic...
     //             if let Some(specifier) = specifier {
     //                 let locals = locals.get(name, &self.markers);
@@ -2327,18 +2327,18 @@ impl ForkState {
     //                         .fold_ok(Range::full(), |range, specifier| {
     //                             range.intersection(&specifier.into())
     //                         })?;
-    
+
     //                     // Add the local version.
     //                     *version = version.union(&local);
     //                 }
     //             }
     //         }
-    
+
     //         if let Some(for_package) = for_package {
     //             debug!("Adding transitive dependency for {for_package}: {package}{version}");
     //         } else {
     //             debug!("Adding direct dependency: {package}{version}");
-    
+
     //             let is_workspace_member = if let Some(package_name) = for_package {
     //                 // PackageName::new(package_name).ok().map_or(false, |pkg_name| {
     //                     PackageName::new(package_name.to_string()).ok().map_or(false, |pkg_name| {
@@ -2347,12 +2347,12 @@ impl ForkState {
     //             } else {
     //                 false
     //             };
-    
+
     //             // Check if this dependency is listed in the project's dependencies
     //             let is_direct_dependency = project
     //                 .and_then(|proj| proj.dependencies.as_ref()) // Safely access dependencies if it exists
     //                 .map_or(false, |deps| deps.contains(&package.to_string())); // Compare with the package name
-    
+
     //             if is_direct_dependency && !is_workspace_member {
     //                 // Warn the user if a direct dependency lacks a lower bound in `--lowest` resolution.
     //                 let missing_lower_bound = version
@@ -2363,7 +2363,7 @@ impl ForkState {
     //                     resolution_strategy,
     //                     ResolutionStrategy::Lowest | ResolutionStrategy::LowestDirect(..)
     //                 );
-    
+
     //                 if !has_url && missing_lower_bound && strategy_lowest {
     //                     warn_user_once!(
     //                         "The direct dependency `{package}` is unpinned. \
@@ -2377,10 +2377,10 @@ impl ForkState {
     //                 );
     //             }
     //         }
-    
+
     //         self.priorities.insert(package, version, &self.fork_urls);
     //     }
-    
+
     //     self.pubgrub.add_package_version_dependencies(
     //         self.next.clone(),
     //         version.clone(),
@@ -2416,7 +2416,7 @@ impl ForkState {
         //         specifier,
         //         url,
         //     } = dependency;
-    
+
         //     let mut has_url = false;
         //     if let Some(name) = package.name() {
         //         // Existing URL handling logic...
@@ -2424,7 +2424,7 @@ impl ForkState {
         //             self.fork_urls.insert(name, url, &self.markers)?;
         //             has_url = true;
         //         }
-    
+
         //         // Handle local version logic...
         //         if let Some(specifier) = specifier {
         //             let locals = locals.get(name, &self.markers);
@@ -2441,122 +2441,127 @@ impl ForkState {
         //                     .fold_ok(Range::full(), |range, specifier| {
         //                         range.intersection(&specifier.into())
         //                     })?;
-    
+
         //                 // Add the local version.
         //                 *version = version.union(&local);
         //             }
         //         }
         //     }
-    
-            // if let Some(for_package) = for_package {
-            //     debug!("Adding transitive dependency for {for_package}: {package}{version}");
-            // } else {
-            //     debug!("Adding direct dependency: {package}{version}");
-    
-            //     let is_workspace_member = resolver_state.and_then(|state| {
-            //         package.name().and_then(|name| {
-            //             PackageName::new(name.to_string()).ok().map(|pkg_name| {
-            //                 state.workspace_members.contains(&pkg_name)
-            //             })
-            //         })
-            //     }).unwrap_or(false);
-    
-            //     let is_direct_dependency = project
-            //         .and_then(|proj| proj.dependencies.as_ref())
-            //         .map_or(false, |deps| deps.contains(&package.to_string()));
-    
-            //     if is_direct_dependency && !is_workspace_member {
-            //         // Warn the user if a direct dependency lacks a lower bound in `--lowest` resolution.
-            //         let missing_lower_bound = version
-            //             .bounding_range()
-            //             .map(|(lowest, _highest)| lowest == Bound::Unbounded)
-            //             .unwrap_or(true);
-            //         let strategy_lowest = matches!(
-            //             resolution_strategy,
-            //             ResolutionStrategy::Lowest | ResolutionStrategy::LowestDirect(..)
-            //         );
-    
-            //         if !has_url && missing_lower_bound && strategy_lowest {
-            //             warn_user_once!(
-            //                 "The direct dependency `{package}` is unpinned. \
-            //                 Consider setting a lower bound when using `--resolution-strategy lowest` \
-            //                 to avoid using outdated versions."
-            //             );
-            //         }
-            //     } else if !is_workspace_member && !is_direct_dependency {
-            //         warn_user_once!(
-            //             "The package `{package}` is not recognized as a direct dependency."
-            //         );
-            //     }
-            // }
 
-            debug!("Entering add_package_version_dependencies");
-    debug!("for_package: {:?}", for_package);
-    debug!("version: {:?}", version);
-    debug!("dependencies count: {}", dependencies.len());
-    debug!("project is Some: {}", project.is_some());
-    debug!("resolver_state is Some: {}", resolver_state.is_some());
+        // if let Some(for_package) = for_package {
+        //     debug!("Adding transitive dependency for {for_package}: {package}{version}");
+        // } else {
+        //     debug!("Adding direct dependency: {package}{version}");
 
-    for dependency in &mut dependencies {
-        let PubGrubDependency {
-            package,
-            version,
-            specifier,
-            url,
-        } = dependency;
+        //     let is_workspace_member = resolver_state.and_then(|state| {
+        //         package.name().and_then(|name| {
+        //             PackageName::new(name.to_string()).ok().map(|pkg_name| {
+        //                 state.workspace_members.contains(&pkg_name)
+        //             })
+        //         })
+        //     }).unwrap_or(false);
 
-        debug!("Processing dependency: {:?}", package);
+        //     let is_direct_dependency = project
+        //         .and_then(|proj| proj.dependencies.as_ref())
+        //         .map_or(false, |deps| deps.contains(&package.to_string()));
 
-        let mut has_url = false;
-        if let Some(name) = package.name() {
-            debug!("Package name: {}", name);
-            // Existing URL handling logic...
-            if let Some(url) = urls.get_url(name, url.as_ref(), git)? {
-                self.fork_urls.insert(name, url, &self.markers)?;
-                has_url = true;
-                debug!("URL found for package");
+        //     if is_direct_dependency && !is_workspace_member {
+        //         // Warn the user if a direct dependency lacks a lower bound in `--lowest` resolution.
+        //         let missing_lower_bound = version
+        //             .bounding_range()
+        //             .map(|(lowest, _highest)| lowest == Bound::Unbounded)
+        //             .unwrap_or(true);
+        //         let strategy_lowest = matches!(
+        //             resolution_strategy,
+        //             ResolutionStrategy::Lowest | ResolutionStrategy::LowestDirect(..)
+        //         );
+
+        //         if !has_url && missing_lower_bound && strategy_lowest {
+        //             warn_user_once!(
+        //                 "The direct dependency `{package}` is unpinned. \
+        //                 Consider setting a lower bound when using `--resolution-strategy lowest` \
+        //                 to avoid using outdated versions."
+        //             );
+        //         }
+        //     } else if !is_workspace_member && !is_direct_dependency {
+        //         warn_user_once!(
+        //             "The package `{package}` is not recognized as a direct dependency."
+        //         );
+        //     }
+        // }
+
+        debug!("Entering add_package_version_dependencies");
+        debug!("for_package: {:?}", for_package);
+        debug!("version: {:?}", version);
+        debug!("dependencies count: {}", dependencies.len());
+        debug!("project is Some: {}", project.is_some());
+        debug!("resolver_state is Some: {}", resolver_state.is_some());
+
+        for dependency in &mut dependencies {
+            let PubGrubDependency {
+                package,
+                version,
+                specifier,
+                url,
+            } = dependency;
+
+            debug!("Processing dependency: {:?}", package);
+
+            let mut has_url = false;
+            if let Some(name) = package.name() {
+                debug!("Package name: {}", name);
+                // Existing URL handling logic...
+                if let Some(url) = urls.get_url(name, url.as_ref(), git)? {
+                    self.fork_urls.insert(name, url, &self.markers)?;
+                    has_url = true;
+                    debug!("URL found for package");
+                }
+
+                // Handle local version logic...
+                if let Some(specifier) = specifier {
+                    debug!("Processing local version for specifier: {:?}", specifier);
+                    // ... (existing local version logic)
+                }
             }
 
-            // Handle local version logic...
-            if let Some(specifier) = specifier {
-                debug!("Processing local version for specifier: {:?}", specifier);
-                // ... (existing local version logic)
-            }
-        }
-
-        let is_workspace_member = resolver_state.and_then(|state| {
-            package.name().and_then(|name| {
-                PackageName::new(name.to_string()).ok().map(|pkg_name| {
-                    state.workspace_members.contains(&pkg_name)
+            let is_workspace_member = resolver_state
+                .and_then(|state| {
+                    package.name().and_then(|name| {
+                        PackageName::new(name.to_string())
+                            .ok()
+                            .map(|pkg_name| state.workspace_members.contains(&pkg_name))
+                    })
                 })
-            })
-        }).unwrap_or(false);
+                .unwrap_or(false);
 
-        let is_direct_dependency = project
-            .and_then(|proj| proj.dependencies.as_ref())
-            .map_or(false, |deps| deps.contains(&package.to_string()));
+            let is_direct_dependency = project
+                .and_then(|proj| proj.dependencies.as_ref())
+                .map_or(false, |deps| deps.contains(&package.to_string()));
 
-        debug!("is_workspace_member: {}", is_workspace_member);
-        debug!("is_direct_dependency: {}", is_direct_dependency);
+            debug!("is_workspace_member: {}", is_workspace_member);
+            debug!("is_direct_dependency: {}", is_direct_dependency);
 
-        if let Some(for_package) = for_package {
-            debug!("Adding transitive dependency for {for_package}: {package}{version}");
-        } else {
-            debug!("Adding direct dependency: {package}{version}");
+            if let Some(for_package) = for_package {
+                debug!("Adding transitive dependency for {for_package}: {package}{version}");
+            } else {
+                debug!("Adding direct dependency: {package}{version}");
 
-            if is_direct_dependency && !is_workspace_member {
-                // ... (existing warning logic for unpinned dependencies)
-            } else if !is_workspace_member && !is_direct_dependency {
-                warn_user_once!(
-                    "The package `{package}` is not recognized as a direct dependency."
-                );
-                debug!("Warning issued for non-direct, non-workspace package: {}", package);
+                if is_direct_dependency && !is_workspace_member {
+                    // ... (existing warning logic for unpinned dependencies)
+                } else if !is_workspace_member && !is_direct_dependency {
+                    warn_user_once!(
+                        "The package `{package}` is not recognized as a direct dependency."
+                    );
+                    debug!(
+                        "Warning issued for non-direct, non-workspace package: {}",
+                        package
+                    );
+                }
             }
-        }
-    
+
             self.priorities.insert(package, version, &self.fork_urls);
         }
-    
+
         self.pubgrub.add_package_version_dependencies(
             self.next.clone(),
             version.clone(),
@@ -2572,7 +2577,7 @@ impl ForkState {
         );
         Ok(())
     }
-    
+
     fn add_unavailable_version(
         &mut self,
         version: Version,
