@@ -146,15 +146,15 @@ impl ReferenceOrOid<'_> {
             // Resolve the commit pointed to by the branch.
             Self::Reference(GitReference::Branch(s)) => repo.rev_parse(&format!("origin/{s}^0")),
 
-            // Attempt to resolve the branch, then the tag.
+            // Try tag first, then fall back to branch if not found
             Self::Reference(GitReference::BranchOrTag(s)) => repo
-                .rev_parse(&format!("origin/{s}^0"))
-                .or_else(|_| repo.rev_parse(&format!("refs/remotes/origin/tags/{s}^0"))),
+                .rev_parse(&format!("refs/remotes/origin/tags/{s}^0"))
+                .or_else(|_| repo.rev_parse(&format!("origin/{s}^0"))),
 
-            // Attempt to resolve the branch, then the tag, then the commit.
+            // Try tag first, then branch, then commit
             Self::Reference(GitReference::BranchOrTagOrCommit(s)) => repo
-                .rev_parse(&format!("origin/{s}^0"))
-                .or_else(|_| repo.rev_parse(&format!("refs/remotes/origin/tags/{s}^0")))
+                .rev_parse(&format!("refs/remotes/origin/tags/{s}^0"))
+                .or_else(|_| repo.rev_parse(&format!("origin/{s}^0")))
                 .or_else(|_| repo.rev_parse(&format!("{s}^0"))),
 
             // We'll be using the HEAD commit.
@@ -507,6 +507,7 @@ impl GitCheckout {
 ///
 /// * Turns [`GitReference`] into refspecs accordingly.
 /// * Dispatches `git fetch` using the git CLI.
+/// * Prioritizes tags over branches for ambiguous references.
 ///
 /// The `remote_url` argument is the git remote URL where we want to fetch from.
 fn fetch(
@@ -526,17 +527,15 @@ fn fetch(
         }
     };
 
-    // Translate the reference desired here into an actual list of refspecs
-    // which need to get fetched. Additionally record if we're fetching tags.
+    // Translate the reference desired here into actual refspecs
     let mut refspecs = Vec::new();
-    let mut tags = false;
+    let tags = false;
     let mut refspec_strategy = RefspecStrategy::All;
+
     // The `+` symbol on the refspec means to allow a forced (fast-forward)
     // update which is needed if there is ever a force push that requires a
     // fast-forward.
     match reference {
-        // For branches and tags we can fetch simply one reference and copy it
-        // locally, no need to fetch other branches/tags.
         ReferenceOrOid::Reference(GitReference::Branch(branch)) => {
             refspecs.push(format!("+refs/heads/{branch}:refs/remotes/origin/{branch}"));
         }
@@ -545,33 +544,31 @@ fn fetch(
             refspecs.push(format!("+refs/tags/{tag}:refs/remotes/origin/tags/{tag}"));
         }
 
-        ReferenceOrOid::Reference(GitReference::BranchOrTag(branch_or_tag)) => {
+        ReferenceOrOid::Reference(GitReference::BranchOrTag(name)) => {
+            // Try tag first
             refspecs.push(format!(
-                "+refs/heads/{branch_or_tag}:refs/remotes/origin/{branch_or_tag}"
+                "+refs/tags/{name}:refs/remotes/origin/tags/{name}"
             ));
+            // Then try branch
             refspecs.push(format!(
-                "+refs/tags/{branch_or_tag}:refs/remotes/origin/tags/{branch_or_tag}"
+                "+refs/heads/{name}:refs/remotes/origin/{name}"
             ));
             refspec_strategy = RefspecStrategy::First;
         }
 
-        // For ambiguous references, we can fetch the exact commit (if known); otherwise,
-        // we fetch all branches and tags.
-        ReferenceOrOid::Reference(GitReference::BranchOrTagOrCommit(branch_or_tag_or_commit)) => {
-            // The `oid_to_fetch` is the exact commit we want to fetch. But it could be the exact
-            // commit of a branch or tag. We should only fetch it directly if it's the exact commit
-            // of a short commit hash.
-            if let Some(oid_to_fetch) =
-                oid_to_fetch.filter(|oid| is_short_hash_of(branch_or_tag_or_commit, *oid))
-            {
+        ReferenceOrOid::Reference(GitReference::BranchOrTagOrCommit(name)) => {
+            if let Some(oid_to_fetch) = oid_to_fetch.filter(|oid| is_short_hash_of(&name, *oid)) {
                 refspecs.push(format!("+{oid_to_fetch}:refs/commit/{oid_to_fetch}"));
             } else {
-                // We don't know what the rev will point to. To handle this
-                // situation we fetch all branches and tags, and then we pray
-                // it's somewhere in there.
-                refspecs.push(String::from("+refs/heads/*:refs/remotes/origin/*"));
-                refspecs.push(String::from("+HEAD:refs/remotes/origin/HEAD"));
-                tags = true;
+                // Try in priority order: tags first, then branches, then commit
+                refspecs.push(format!(
+                    "+refs/tags/{name}:refs/remotes/origin/tags/{name}"
+                ));
+                refspecs.push(format!(
+                    "+refs/heads/{name}:refs/remotes/origin/{name}"
+                ));
+                refspecs.push(format!("+{name}:refs/commit/{name}"));
+                refspec_strategy = RefspecStrategy::First;
             }
         }
 
@@ -594,7 +591,7 @@ fn fetch(
             fetch_with_cli(repo, remote_url, refspecs.as_slice(), tags, disable_ssl)
         }
         RefspecStrategy::First => {
-            // Try each refspec
+            // Try each refspec in priority order until one succeeds
             let mut errors = refspecs
                 .iter()
                 .map_while(|refspec| {
@@ -630,8 +627,8 @@ fn fetch(
             }
         }
     };
+
     match reference {
-        // With the default branch, adding context is confusing
         ReferenceOrOid::Reference(GitReference::DefaultBranch) => result,
         _ => result.with_context(|| {
             format!(
@@ -642,7 +639,6 @@ fn fetch(
         }),
     }
 }
-
 /// Attempts to use `git` CLI installed on the system to fetch a repository.
 fn fetch_with_cli(
     repo: &mut GitRepository,
