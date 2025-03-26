@@ -3,9 +3,9 @@ requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "uv"
-version = "0.6.10"
-description = "An extremely fast Python package and project manager, written in Rust."
+name = "test-project"
+version = "0.1.0"
+description = "Test project for secp256k1 installation"
 authors = [{ name = "Astral Software Inc.", email = "hey@astral.sh" }]
 requires-python = ">=3.8"
 keywords = [
@@ -31,6 +31,7 @@ classifiers = [
   "Topic :: Software Development :: Libraries",
 ]
 readme = "README.md"
+dependencies = ["secp256k1==0.14.0"]
 
 [project.urls]
 Repository = "https://github.com/astral-sh/uv"
@@ -97,3 +98,4 @@ files = [
 
 [tool.uv]
 managed = false
+no-build-isolation-package = ["secp256k1"]
