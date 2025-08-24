@@ -2199,6 +2199,7 @@ async fn run_project(
                 args.diff,
                 args.extra_args,
                 args.version,
+                args.no_project,
                 globals.network_settings,
                 cache,
                 printer,

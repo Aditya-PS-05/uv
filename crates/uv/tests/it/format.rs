@@ -394,3 +394,72 @@ fn format_version_option() -> Result<()> {
 
     Ok(())
 }
+
+#[test]
+fn format_no_project() -> Result<()> {
+    let context = TestContext::new_with_versions(&[]);
+
+    let pyproject_toml = context.temp_dir.child("pyproject.toml");
+    pyproject_toml.write_str(indoc! {r#"
+        [project]
+        name = "project"
+        version = "0.1.0"
+        requires-python = ">=3.12"
+        dependencies = []
+    "#})?;
+
+    // Create an unformatted Python file
+    let main_py = context.temp_dir.child("main.py");
+    main_py.write_str(indoc! {r#"
+        import sys
+        def   hello():
+            print(  "Hello, World!"  )
+        if __name__=="__main__":
+            hello(   )
+    "#})?;
+
+    let subdir = context.temp_dir.child("subdir");
+    fs_err::create_dir_all(&subdir)?;
+
+    // Create an unformatted file in the subdirectory
+    let subdir_py = subdir.child("subdir.py");
+    subdir_py.write_str(indoc! {r#"
+        import os
+        def   goodbye():
+            print(  "Goodbye!"  )
+    "#})?;
+
+    // Using format with --no-project should run from current directory (subdir)
+    // and not use the project root, so it should only format files in the subdir
+    uv_snapshot!(context.filters(), context.format().arg("--no-project").current_dir(&subdir), @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    1 file reformatted
+
+    ----- stderr -----
+    warning: `uv format` is experimental and may change without warning. Pass `--preview-features format` to disable this warning.
+    ");
+
+    // Check that the file in subdir was formatted
+    let subdir_content = fs_err::read_to_string(&subdir_py)?;
+    assert_snapshot!(subdir_content, @r#"
+    import os
+
+
+    def goodbye():
+        print("Goodbye!")
+    "#);
+
+    // Check that the root main.py file was not formatted (since we ran from subdir with --no-project)
+    let main_content = fs_err::read_to_string(&main_py)?;
+    assert_snapshot!(main_content, @r#"
+    import sys
+    def   hello():
+        print(  "Hello, World!"  )
+    if __name__=="__main__":
+        hello(   )
+    "#);
+
+    Ok(())
+}

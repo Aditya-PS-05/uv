@@ -4340,6 +4340,14 @@ pub struct FormatArgs {
     #[arg(long)]
     pub version: Option<String>,
 
+    /// Avoid discovering a `pyproject.toml` or `uv.toml` file in the current directory or any
+    /// parent directories. Instead, run without project configuration, if any.
+    ///
+    /// When used, uv will not use the project root as the working directory for the formatter,
+    /// instead running from the current working directory.
+    #[arg(long, alias = "no-workspace")]
+    pub no_project: bool,
+
     /// Additional arguments to pass to Ruff.
     ///
     /// For example, use `uv format -- --line-length 100` to set the line length or

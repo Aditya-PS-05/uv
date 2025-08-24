@@ -25,6 +25,7 @@ pub(crate) async fn format(
     diff: bool,
     extra_args: Vec<String>,
     version: Option<String>,
+    no_project: bool,
     network_settings: NetworkSettings,
     cache: Cache,
     printer: Printer,
@@ -39,9 +40,16 @@ pub(crate) async fn format(
     }
 
     let workspace_cache = WorkspaceCache::default();
-    let project =
-        VirtualProject::discover(project_dir, &DiscoveryOptions::default(), &workspace_cache)
-            .await?;
+    let project = if no_project {
+        None
+    } else {
+        match VirtualProject::discover(project_dir, &DiscoveryOptions::default(), &workspace_cache).await {
+            Ok(project) => Some(project),
+            Err(err) => {
+                return Err(err.into());
+            }
+        }
+    };
 
     // Parse version if provided
     let version = version.as_deref().map(Version::from_str).transpose()?;
@@ -62,8 +70,11 @@ pub(crate) async fn format(
         .context("Failed to install ruff {version}")?;
 
     let mut command = Command::new(&ruff_path);
-    // Run ruff in the project root
-    command.current_dir(project.root());
+    // Set the working directory: use project root if available, otherwise use the provided project_dir
+    command.current_dir(match &project {
+        Some(project) => project.root(),
+        None => project_dir,
+    });
     command.arg("format");
 
     if check {
