@@ -101,11 +101,13 @@ pub enum AddBoundsKind {
     Lower,
     /// Allow the same major version, similar to the semver caret, e.g., `>=1.2.3, <2.0.0`.
     ///
-    /// Leading zeroes are skipped, e.g. `>=0.1.2, <0.2.0`.
+    /// The most significant component is treated as the major version, even when it is zero,
+    /// e.g., `>=0.10.0, <1.0.0`.
     Major,
     /// Allow the same minor version, similar to the semver tilde, e.g., `>=1.2.3, <1.3.0`.
     ///
-    /// Leading zeroes are skipped, e.g. `>=0.1.2, <0.1.3`.
+    /// The second most significant component is treated as the minor version, even when the
+    /// major version is zero, e.g., `>=0.10.0, <0.11.0`.
     Minor,
     /// Pin the exact version, e.g., `==1.2.3`.
     ///
@@ -126,48 +128,26 @@ impl Display for AddBoundsKind {
 
 impl AddBoundsKind {
     fn specifiers(self, version: Version) -> VersionSpecifiers {
-        // Nomenclature: "major" is the most significant component of the version, "minor" is the
-        // second most significant component, so most versions are either major.minor.patch or
-        // 0.major.minor.
+        // Nomenclature: "major" is the most significant release component (`release[0]`), "minor"
+        // is the second most significant (`release[1]`). Following semver and PEP 440 component
+        // naming, this holds even when the major version is zero, so `0.10.0` has major `0` and
+        // minor `10`.
         match self {
             Self::Lower => {
                 VersionSpecifiers::from(VersionSpecifier::greater_than_equal_version(version))
             }
             Self::Major => {
-                let leading_zeroes = version
-                    .release()
-                    .iter()
-                    .take_while(|digit| **digit == 0)
-                    .count();
-
-                // Special case: The version is 0.
-                if leading_zeroes == version.release().len() {
-                    let upper_bound = Version::new(
-                        [0, 1]
-                            .into_iter()
-                            .chain(iter::repeat_n(0, version.release().iter().skip(2).len())),
-                    );
-                    return VersionSpecifiers::from_iter([
-                        VersionSpecifier::greater_than_equal_version(version),
-                        VersionSpecifier::less_than_version(upper_bound),
-                    ]);
-                }
-
-                // Compute the new major version and pad it to the same length:
+                // Bump the major version and zero everything after it, preserving the original
+                // length:
                 // 1.2.3 -> 2.0.0
-                // 1.2 -> 2.0
+                // 0.10.0 -> 1.0.0
+                // 0.1 -> 1.0
                 // 1 -> 2
-                // We ignore leading zeroes, adding Semver-style semantics to 0.x versions, too:
-                // 0.1.2 -> 0.2.0
-                // 0.0.1 -> 0.0.2
-                let major = version.release().get(leading_zeroes).copied().unwrap_or(0);
-                // The length of the lower bound minus the leading zero and bumped component.
-                let trailing_zeros = version.release().iter().skip(leading_zeroes + 1).len();
-                let upper_bound = Version::new(
-                    iter::repeat_n(0, leading_zeroes)
-                        .chain(iter::once(major + 1))
-                        .chain(iter::repeat_n(0, trailing_zeros)),
-                );
+                let release = version.release();
+                let major = release.first().copied().unwrap_or(0);
+                let trailing_zeros = release.len().saturating_sub(1);
+                let upper_bound =
+                    Version::new(iter::once(major + 1).chain(iter::repeat_n(0, trailing_zeros)));
 
                 VersionSpecifiers::from_iter([
                     VersionSpecifier::greater_than_equal_version(version),
@@ -175,67 +155,20 @@ impl AddBoundsKind {
                 ])
             }
             Self::Minor => {
-                let leading_zeroes = version
-                    .release()
-                    .iter()
-                    .take_while(|digit| **digit == 0)
-                    .count();
-
-                // Special case: The version is 0.
-                if leading_zeroes == version.release().len() {
-                    let upper_bound = [0, 0, 1]
-                        .into_iter()
-                        .chain(iter::repeat_n(0, version.release().iter().skip(3).len()));
-                    return VersionSpecifiers::from_iter([
-                        VersionSpecifier::greater_than_equal_version(version),
-                        VersionSpecifier::less_than_version(Version::new(upper_bound)),
-                    ]);
-                }
-
-                // If both major and minor version are 0, the concept of bumping the minor version
-                // instead of the major version is not useful. Instead, we bump the next
-                // non-zero part of the version. This avoids extending the three components of 0.0.1
-                // to the four components of 0.0.1.1.
-                if leading_zeroes >= 2 {
-                    let most_significant =
-                        version.release().get(leading_zeroes).copied().unwrap_or(0);
-                    // The length of the lower bound minus the leading zero and bumped component.
-                    let trailing_zeros = version.release().iter().skip(leading_zeroes + 1).len();
-                    let upper_bound = Version::new(
-                        iter::repeat_n(0, leading_zeroes)
-                            .chain(iter::once(most_significant + 1))
-                            .chain(iter::repeat_n(0, trailing_zeros)),
-                    );
-                    return VersionSpecifiers::from_iter([
-                        VersionSpecifier::greater_than_equal_version(version),
-                        VersionSpecifier::less_than_version(upper_bound),
-                    ]);
-                }
-
-                // Compute the new minor version and pad it to the same length where possible:
+                // Bump the minor version and zero everything after it, padding to at least two
+                // components:
                 // 1.2.3 -> 1.3.0
+                // 0.10.0 -> 0.11.0
                 // 1.2 -> 1.3
                 // 1 -> 1.1
-                // We ignore leading zero, adding Semver-style semantics to 0.x versions, too:
-                // 0.1.2 -> 0.1.3
-                // 0.0.1 -> 0.0.2
-
-                // If the version has only one digit, say `1`, or if there are only leading zeroes,
-                // pad with zeroes.
-                let major = version.release().get(leading_zeroes).copied().unwrap_or(0);
-                let minor = version
-                    .release()
-                    .get(leading_zeroes + 1)
-                    .copied()
-                    .unwrap_or(0);
+                let release = version.release();
+                let major = release.first().copied().unwrap_or(0);
+                let minor = release.get(1).copied().unwrap_or(0);
+                let trailing_zeros = release.len().saturating_sub(2);
                 let upper_bound = Version::new(
-                    iter::repeat_n(0, leading_zeroes)
-                        .chain(iter::once(major))
-                        .chain(iter::once(minor + 1))
-                        .chain(iter::repeat_n(
-                            0,
-                            version.release().iter().skip(leading_zeroes + 2).len(),
-                        )),
+                    [major, minor + 1]
+                        .into_iter()
+                        .chain(iter::repeat_n(0, trailing_zeros)),
                 );
 
                 VersionSpecifiers::from_iter([
@@ -1919,14 +1852,17 @@ dependencies = [
     #[test]
     fn bound_kind_to_specifiers_major() {
         let tests = [
-            ("0", ">=0, <0.1"),
-            ("0.0", ">=0.0, <0.1"),
-            ("0.0.0", ">=0.0.0, <0.1.0"),
-            ("0.0.0.0", ">=0.0.0.0, <0.1.0.0"),
-            ("0.1", ">=0.1, <0.2"),
-            ("0.0.1", ">=0.0.1, <0.0.2"),
-            ("0.0.1.1", ">=0.0.1.1, <0.0.2.0"),
-            ("0.0.0.1", ">=0.0.0.1, <0.0.0.2"),
+            ("0", ">=0, <1"),
+            ("0.0", ">=0.0, <1.0"),
+            ("0.0.0", ">=0.0.0, <1.0.0"),
+            ("0.0.0.0", ">=0.0.0.0, <1.0.0.0"),
+            ("0.1", ">=0.1, <1.0"),
+            ("0.0.1", ">=0.0.1, <1.0.0"),
+            ("0.0.1.1", ">=0.0.1.1, <1.0.0.0"),
+            ("0.0.0.1", ">=0.0.0.1, <1.0.0.0"),
+            // Regression test for https://github.com/astral-sh/uv/issues/19047 — for `0.y.z`
+            // packages the major component is `0`, so the upper bound bumps to `<1.0.0`.
+            ("0.10.0", ">=0.10.0, <1.0.0"),
             ("1", ">=1, <2"),
             ("1.0.0", ">=1.0.0, <2.0.0"),
             ("1.2", ">=1.2, <2.0"),
@@ -1946,14 +1882,17 @@ dependencies = [
     #[test]
     fn bound_kind_to_specifiers_minor() {
         let tests = [
-            ("0", ">=0, <0.0.1"),
-            ("0.0", ">=0.0, <0.0.1"),
-            ("0.0.0", ">=0.0.0, <0.0.1"),
-            ("0.0.0.0", ">=0.0.0.0, <0.0.1.0"),
-            ("0.1", ">=0.1, <0.1.1"),
-            ("0.0.1", ">=0.0.1, <0.0.2"),
-            ("0.0.1.1", ">=0.0.1.1, <0.0.2.0"),
-            ("0.0.0.1", ">=0.0.0.1, <0.0.0.2"),
+            ("0", ">=0, <0.1"),
+            ("0.0", ">=0.0, <0.1"),
+            ("0.0.0", ">=0.0.0, <0.1.0"),
+            ("0.0.0.0", ">=0.0.0.0, <0.1.0.0"),
+            ("0.1", ">=0.1, <0.2"),
+            ("0.0.1", ">=0.0.1, <0.1.0"),
+            ("0.0.1.1", ">=0.0.1.1, <0.1.0.0"),
+            ("0.0.0.1", ">=0.0.0.1, <0.1.0.0"),
+            // Regression test for https://github.com/astral-sh/uv/issues/19047 — for `0.y.z`
+            // packages the minor component is `y`, so the upper bound bumps to `<0.(y+1).0`.
+            ("0.10.0", ">=0.10.0, <0.11.0"),
             ("1", ">=1, <1.1"),
             ("1.0.0", ">=1.0.0, <1.1.0"),
             ("1.2", ">=1.2, <1.3"),
